@@ -2715,7 +2715,7 @@ Observable 和 Observer 的使用方法和前面讲过的一样，只是 Observa
 >
 > 策略模式对应于解决某一个问题的算法族（策略组），允许用户从该算法族中任意选择一个算法解决某一问题，同时可以方便的更换算法或者增加新的算法。并且由客户端决定调用哪个算法。
 >
-> 策略模式体现了几个设计原则，第一，把变化的代码从不变的代码中分离出来；第二，针对接口编程，而不是具体的实现类（定义了策略接口）；第三，多用了组合/聚合，少用策略（客户通过组合方式策略）；
+> 策略模式体现了几个设计原则，第一，把变化的代码从不变的代码中分离出来；第二，针对接口编程，而不是具体的实现类（定义了策略接口）；第三，多用了组合/聚合，少用继承（客户通过组合方式策略）；
 
 ### 2.2 实现原理类图
 
@@ -2743,6 +2743,8 @@ Observable 和 Observer 的使用方法和前面讲过的一样，只是 Observa
 老客户小批量报价
 老客户大批量报价
 具体选用哪个报价策略，这需要根据实际情况来确定。这时候，我们采用策略模式即可。
+
+![1568557624542](.\img\1568557624542.png)
 
 ```java
 package cn.demo.strategy;
@@ -2883,7 +2885,9 @@ public class NewCustomerManyStrategyImpl implements IStrategy {
 
 ### 2.4 JDK源码-策略模式场景
 
+JDK的`Arrays`的`Comparator`就使用了策略模式。
 
+![1568550019005](.\img\1568550019005.png)
 
 ```java
 package com.atguigu.jdk;
@@ -2953,17 +2957,364 @@ public class Strategy {
 
 ```
 
+### 2.5 总结
+
+1. 策略模式的关键是：**分析项目中，变化部门与不变部分；**
+2. 策略模式的核心思想是：**多用组合/聚合，少用继承**；用行为类组合，而不是行为的继承。更有弹性；
+3. 体现了**对修改关闭，对扩展开放**的原则，客户端增加行为，不用修改原有代码，只需要添加一种策略（或者行为）即可，避免了使用多重转移语句（if...else...if...esle）;
+4. 提供了可以代替继承关系的办法：策略模式将算法封装在独立的Strategy类中使得你可以独立于Context改变它，使他易于切换，易于理解，易于扩展；
+5. 需要注意的是：每添加一个策略就要增加一个类，当策略过多是会导致类数目庞；
 
 
 
+## 3. 职责链模式
+
+### 3.1 基本介绍
+
+- 职责链模式（chain of Responsibility Pattern）,又叫 责任链模式，为请求创建了一个接收者对象的链。这种模式对请求的发送者和接收者进行解耦。
+- 职责链模式中通常每个接收者都包含对另一个接收者的引用（单向链表）。将能够处理同一类请求的对象连成一条链，所提交的请求沿着链传递，链上的对象逐个判断是否有能力处理该请求，如果能则处理，如果不能则传递给链上的下一个对象。
+
+### 3.2 职责链原理类图
+
+![1568557318833](.\img\1568557318833.png)
+
+- Handler：抽象的处理者，定义了一个处理请求的接口，同时含有另外的Handler；
+- ConcreteHandlerA，B 是具体的处理者，处理它自己负责的请求，可以访问他的后继者（即下一个处理者），如果可以处理当前请求，则处理，否者就将该请求交给后继者去处理，从而形成一个职责链；
+- Request：含义很多属性，表示一个请求；
+
+### 3.3 案例
+
+**实例要求**
+
+编写程序完成学校 OA 系统的采购审批项目：需求
+
+采购员采购教学器材
+
+如果金额 小于等于 5000, 由教学主任审批
+
+如果金额 小于等于 10000, 由院长审批
+
+如果金额 小于等于 30000, 由副校长审批
+
+如果金额 超过 30000 以上，有校长审批
+
+![1568642637966](.\img\1568642637966.png)
+
+```java
+package cn.demo.responsibilitychain;
+
+/**
+ * 职责链模式：
+ *      又叫责任链模式了，为请求创建了一个接收者对象的链，这种模式让请求的发送者和接收者进行了解耦；
+ *      职责链模式中通常每个接收者都包含另一个接收者的引用（单向链表）；将处理相同类请求的对象连成一条链，所提交的请求沿着链传递，
+ *      链中的对象逐个判断是否有能力处理该请求，能则处理，不能则传递给链中的下一个对象来处理；
+ *  职责链中的几种角色：
+ *      Handler：抽象构建角色，所有具体处理对象的父类；
+ *      ConcreteHandler：真实构建角色，具体的构建角色；处理它自己负责的请求，能则处理，不能则传递给他的后继者（即下一个处理对象）
+ *              去处理，从而形成一个职责链；
+ *      Request：一个请求，包含很多属性；
+ * @author Jjcc
+ * @version 1.0.0
+ * @description
+ * @className Client.java
+ * @createTime 2019年09月15日 22:07:00
+ */
+public class Client {
+    public static void main(String[] args){
+        // TODO Auto-generated method stub
+        //创建一个请求
+        PurchaseRequest purchaseRequest = new PurchaseRequest(1, 11100, 1);
+
+        //创建相关的审批人
+        DepartmentApprover departmentApprover = new DepartmentApprover("张主任");
+        CollegeApprover collegeApprover = new CollegeApprover("李院长");
+        ViceSchoolMasterApprover viceSchoolMasterApprover = new ViceSchoolMasterApprover("王副校");
 
 
+        //需要将各个审批级别的下一个设置好 (处理人构成环形: )
+        departmentApprover.setNextApprover(collegeApprover);
+        collegeApprover.setNextApprover(viceSchoolMasterApprover);
 
+        departmentApprover.processRequest(purchaseRequest);
+//        viceSchoolMasterApprover.processRequest(purchaseRequest);
 
+    }
+}
 
+```
 
+```java
+package cn.demo.responsibilitychain;
 
+/**
+ * 请求类；
+ * @author Jjcc
+ * @version 1.0.0
+ * @description
+ * @className PurchaseRequest.java
+ * @createTime 2019年09月16日 21:23:00
+ */
+public class PurchaseRequest {
+    /**
+     * 请求类型
+     */
+    private int type;
+    /**
+     * 请求金额
+     */
+    private float price;
+    /**
+     * id
+     */
+    private int id;
 
+    /**
+     * 构造器
+     * @title PurchaseRequest
+     * @description
+     * @author Jjcc
+     * @param type
+     * @param price
+     * @param id
+     * @return
+     * @createTime 2019/9/16 21:24
+     * @throws
+     */
+    public PurchaseRequest(int type, float price, int id) {
+        this.type = type;
+        this.price = price;
+        this.id = id;
+    }
+    public int getType() {
+        return type;
+    }
+    public float getPrice() {
+        return price;
+    }
+    public int getId() {
+        return id;
+    }
+}
+
+```
+
+```java
+package cn.demo.responsibilitychain;
+
+/**
+ * Handler：抽象构建角色，所有具体处理类的父类；
+ * @author Jjcc
+ * @version 1.0.0
+ * @description
+ * @className Approver.java
+ * @createTime 2019年09月16日 21:32:00
+ */
+public abstract class BaseApprover {
+
+    /**
+     * name
+     */
+    protected String name;
+
+    /**
+     * 下一个处理对象
+     */
+    protected BaseApprover nextApprover;
+
+    public BaseApprover(String name) {
+        this.name = name;
+    }
+
+    public void setNextApprover(BaseApprover nextApprover) {
+        this.nextApprover = nextApprover;
+    }
+
+    /**
+     * 处理请求的方法，是一个抽象方法，所有子类都必须重写该方法
+     * @title processRequest
+     * @description
+     * @author Jjcc
+     * @param request 请求
+     * @return void
+     * @createTime 2019/9/16 21:35
+     * @throws
+     */
+    public abstract void processRequest(PurchaseRequest request);
+}
+
+```
+
+```java
+package cn.demo.responsibilitychain;
+
+/**
+ * ConcreteHandler：具体的处理类，可以访问他的后继者；处理它自己负责的请求，能则处理，不能则将请求传递给他的后继者，这样就形成了一条职责链；
+ * @author Jjcc
+ * @version 1.0.0
+ * @description
+ * @className DepartmentApprover.java
+ * @createTime 2019年09月16日 21:36:00
+ */
+public class DepartmentApprover extends BaseApprover {
+
+    public DepartmentApprover(String name) {
+        super(name);
+    }
+
+    @Override
+    public void processRequest(PurchaseRequest request) {
+        if (request.getPrice() <= 3000) {
+            System.out.println(" 请求编号 id= " + request.getId() + " 被 " + this.name + " 处理");
+        } else {
+            this.nextApprover.processRequest(request);
+        }
+    }
+}
+
+```
+
+```java
+package cn.demo.responsibilitychain;
+
+/**
+ * ConcreteHandler：具体的处理类，可以访问他的后继者；处理他负责的请求，能则处理，不能则将请求传递给他的后继者进行处理，
+ *      这样就形成了一条职责链；
+ * @author Jjcc
+ * @version 1.0.0
+ * @description
+ * @className CollegeApprover.java
+ * @createTime 2019年09月16日 21:41:00
+ */
+public class CollegeApprover extends BaseApprover {
+
+    public CollegeApprover(String name) {
+        super(name);
+    }
+
+    @Override
+    public void processRequest(PurchaseRequest request) {
+        if (request.getPrice() <= 10000) {
+            System.out.println(" 请求编号 id= " + request.getId() + " 被 " + this.name + " 处理");
+        } else {
+
+            this.nextApprover.processRequest(request);
+        }
+
+    }
+}
+
+```
+
+```java
+package cn.demo.responsibilitychain;
+
+/**
+ * @author Jjcc
+ * @version 1.0.0
+ * @description
+ * @className ViceSchoolMasterApprover.java
+ * @createTime 2019年09月16日 21:45:00
+ */
+public class ViceSchoolMasterApprover extends BaseApprover {
+    public ViceSchoolMasterApprover(String name) {
+        super(name);
+    }
+
+    @Override
+    public void processRequest(PurchaseRequest request) {
+        if(request.getPrice() <= 30000) {
+            System.out.println(" 请求编号 id= " + request.getId() + " 被 " + this.name + " 处理");
+        }else {
+            System.out.println("没有了！！！");
+        }
+    }
+}
+
+```
+
+### 3.4 SpringMVC源码-职责链模式
+
+**SpringMVC-HandlerExecutionChain 类就使用到职责链模式；**
+
+<img src=".\img\1568648544626.png" alt="1568648544626" style="zoom:200%;" />
+
+```java
+package com.atguigu.spring.test;
+
+import org.springframework.web.servlet.HandlerExecutionChain;
+import org.springframework.web.servlet.HandlerInterceptor;
+
+public class ResponsibilityChain {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		// DispatcherServlet 
+		
+		//说明
+		/*
+		 * 
+		 *  protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		 *   HandlerExecutionChain mappedHandler = null; 
+		 *   mappedHandler = getHandler(processedRequest);//获取到HandlerExecutionChain对象
+		 *    //在 mappedHandler.applyPreHandle 内部 得到啦 HandlerInterceptor interceptor
+		 *    //调用了拦截器的  interceptor.preHandle
+		 *   if (!mappedHandler.applyPreHandle(processedRequest, response)) {
+					return;
+				}
+				
+			  //说明：mappedHandler.applyPostHandle 方法内部获取到拦截器，并调用 
+			  //拦截器的  interceptor.postHandle(request, response, this.handler, mv);
+			 mappedHandler.applyPostHandle(processedRequest, response, mv);
+		 *  }
+		 *  
+		 *  
+		 *  //说明：在  mappedHandler.applyPreHandle内部中，
+		 *  还调用了  triggerAfterCompletion 方法，该方法中调用了  
+		 *  HandlerInterceptor interceptor = getInterceptors()[i];
+			try {
+				interceptor.afterCompletion(request, response, this.handler, ex);
+			}
+			catch (Throwable ex2) {
+				logger.error("HandlerInterceptor.afterCompletion threw exception", ex2);
+			}
+		 */
+	
+	}
+
+}
+
+```
+
+**源码总结**
+
+- springmvc 请求的流程图中，执行了 拦截器相关方法 `interceptor.preHandler` 等等；
+- 在处理 SpringMvc 请求时，使用到职责链模式还使用到适配器模式；
+- `HandlerExecutionChain` 主要负责的是请求拦截器的执行和请求处理,但是他本身不处理请求，只是将请求分配给链上注册处理器执行，这是职责链实现方式,减少职责链本身与处理逻辑之间的耦合,规范了处理流程；
+- `HandlerExecutionChain` 维护了 `HandlerInterceptor` 的集合， 可以向其中注册相应的拦截器（**没有使用单向链表，而是把具体的处理对象放入集合中**）；
+
+### 3.5 总结
+
+**定义方式**
+
+1. 单向链表方式定义职责链；
+2. 非链表方式定义职责链；
+   1. **通过集合、数组生成职责链更加实用**！实际上，很多项目中，每个**具体的Handler**并不是由开发团队定义的，而是项目上线后由外部单位追加的，所以使用链表方式定义COR链就很困难。
+
+**总结**
+
+1. 将请求和处理分开，实现解耦，提高系统的灵活性；
+2. 简化了对象，使对象不用知道链的结构；
+3. 性能会受到影响，特别是在 **链比较长的时候**，因此需控制链中最大节点数量，一般通过在 `Handler` 中设置一个最大节点数量，在 setNext()方法中判断是否已经超过阀值，超过则不允许该链建立，避免出现超长链无意识地破坏系统性能；
+4. 调试不方便。采用了类似递归的方式，调试时逻辑可能比较复杂;
+5. 最佳应用场景：有多个对象可以处理同一个请求时，比如：多级请求、请假/加薪等审批流程、Java Web 中 Tomcat对 Encoding 的处理、拦截器;
+
+**开发中常见的场景**
+
+1. Java中，异常机制就是一种责任链模式。一个`try`可以对应对个`catch`，当第一个`catch`不匹配类型，则自动跳到第二个`catch`；
+2. Javascript语言中，事件的冒泡和捕获机制。Java语言中，事件的处理采用观察者模式。
+3. `Servlet` 中过滤器`Filter`的链式处理；
+4. `SpringMVC`中对于请求的处理；
 
 
 
