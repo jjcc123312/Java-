@@ -217,7 +217,7 @@ System.out.println("total2="+total2);
 
 #### **方法区特点:**
 
-​	方法区（Method Area）与Java堆一样，是各个线程共享的内存区域，它用于存储已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。虽然Java虚拟机规范把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫做Non-Heap（非堆），目的应该是与Java堆区分开来。方法区又称为“永久代”（Permanent Generation）。从jdk1.7已经开始准备“去永久代”的规划，jdk1.7的HotSpot中，已经把原本放在方法区中的静态变量、字符串常量池等移到堆内存中。
+​	方法区（Method Area）与Java堆一样，是各个线程共享的内存区域，它用于存储已被类加载器加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。虽然Java虚拟机规范把方法区描述为堆的一个逻辑部分，但是它却有一个别名叫做Non-Heap（非堆），目的应该是与Java堆区分开来。方法区又称为“永久代”（Permanent Generation）。从jdk1.7已经开始准备“去永久代”的规划，jdk1.7的HotSpot中，已经把原本放在方法区中的静态变量、字符串常量池等移到堆内存中。
 
 ​	**在jdk1.8中，永久代** **已经不存在，存储的类信息、编译后的代码数据,运行时常量池等已经移动到了元空间（MetaSpace）中，元空间并没有处于堆内存上，而是直接占用的本地内存（NativeMemory）。**
 
@@ -226,15 +226,15 @@ System.out.println("total2="+total2);
 三种情况：
 java7之前，方法区位于永久代(PermGen)，永久代和堆相互隔离，永久代的大小在启动JVM时可以设置一个固定值，不可变；
 java7中，存储在永久代的部分数据就已经转移到Java Heap或者Native memory。但永久代仍存在于JDK 1.7中，并没有完全移除，譬如符号引用(Symbols)转移到了native memory；字符串常量池(interned strings)转移到了Java heap；类的静态变量(class statics)转移到了Java heap。
-java8中，取消永久代，方法存放于元空间(Metaspace)，元空间仍然与堆不相连，但与堆共享物理内存，逻辑上可认为在堆中.**Native memory：本地内存，也称为C-Heap，是供JVM自身进程使用的。当Java Heap空间不足时会触发GC，但Native memory空间不够却不会触发GC。**
+java8中，取消永久代，方法区存放于元空间(Metaspace)，元空间仍然与堆不相连，但与堆共享物理内存，逻辑上可认为在堆中.**Native memory：本地内存，也称为C-Heap，是供JVM自身进程使用的。当Java Heap空间不足时会触发GC，但Native memory空间不够却不会触发GC。**
 
 **Java1.8之前: **
 
-![](./img/20180821135022994.png)
+![](.\img\20180821135022994.png)
 
 **Java1.8之后: **
 
-![](./img/20180312125453153.jpg)
+![](.\img\20180312125453153.jpg)
 
 
 
@@ -252,9 +252,9 @@ Java中的常量池分为三种类型：
 - 运行时常量池（The Run-Time Constant Pool）
 - String常量池
 
-**类文件中常量池 ---- 存在于Class文件中**
+**类文件常量池 ---- 存在于Class文件中**
 
-所处区域：堆
+所处区域：class文件中
 
 诞生时间：编译时
 
@@ -270,7 +270,7 @@ class常量池是在编译的时候每个class都有的，在编译阶段，存�
 
 诞生时间：JVM运行时
 
-jvm在执行某个类的时候，必须经过加载、链接、初始化，而链接又包括验证、准备、解析三个阶段。而当类加载到内存中后，jvm就会将class常量池中的内容存放到运行时常量池中，由此可知，运行时常量池也是每个类都有一个。在上面我也说了，class常量池中存的是字面量和符号引用，也就是说他们存的并不是对象的实例，而是对象的符号引用值。而经过解析（resolve）之后，也就是把符号引用替换为直接引用，解析的过程会去查询全局字符串池，也就是我们上面所说的StringTable，以保证运行时常量池所引用的字符串与全局字符串池中所引用的是一致的。
+jvm在执行某个类的时候，必须经过加载、链接、初始化，而链接又包括验证、准备、解析三个阶段。而当类加载到内存中后，jvm就会将class常量池中的内容存放到运行时常量池中，由此可知，运行时常量池也是每个类都有一个。class常量池中存的是字面量和符号引用，也就是说他们存的并不是对象的实例，而是对象的符号引用值。而经过解析（resolve）之后，也就是把符号引用替换为直接引用，解析的过程会去查询全局字符串池，也就是我们上面所说的StringTable，以保证运行时常量池所引用的字符串与全局字符串池中所引用的是一致的。
 
 举个实例来说明一下:
 
@@ -304,8 +304,6 @@ public class HelloWorld {
 - str1==str2 指向同一个堆对象，同时创建了一个常量池引用。
 - str3 创建了3个堆对象(**错的,应该是1个堆对象**)，只创建了一个常量池引用。
 - str4 创建了2个堆对象，其中有个对象的value引用另一个的value地址，并未创建常量池引用(**错的, 实际是创建了常量池引用)。**
-
-
 
 **总结**
 
@@ -1518,7 +1516,7 @@ public class Test {
 
 
 
-#### 输出一个字符串中字符出现的次数, 并通过字符存在值从大到小输出
+输出一个字符串中字符出现的次数, 并通过字符存在值从大到小输出
 
 ```Java
 public static void main(String[] args){
@@ -4846,11 +4844,9 @@ public class Employee implements java.io.Serializable {
 - **并发**：指两个或多个事件在**同一个时间段内**发生。**交替执行**
 - **并行**：指两个或多个事件在**同一时刻**发生（同时发生）。**同时执行**
 
-![1555423726186](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1555423726186.png)
+![1555423726186](.\img\6546546546158.png)
 
-
-
-![1555423786648](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1555423786648.png)
+<img src=".\img\1555423786648.png" alt="1555423786648" style="zoom:150%;" />
 
 在操作系统中，安装了多个程序，并发指的是在一段时间内宏观上有多个程序同时运行，这在单 CPU 系统中，每一时刻只能有一道程序执行，即微观上这些程序是分时的交替运行，只不过是给人的感觉是同时运行，那是因为分时交替运行的时间是非常短的。
 
@@ -4874,11 +4870,11 @@ public class Employee implements java.io.Serializable {
 
 **进程**
 
-![1555480283297](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1555480283297.png)
+![1555480283297](.\img\1555480283297.png)
 
 **线程**
 
-![1555480581119](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1555480581119.png)
+![1555480581119](.\img\1555480581119.png)
 
 **线程调度:**
 
@@ -4892,7 +4888,7 @@ public class Employee implements java.io.Serializable {
 
   - 设置线程的优先级
 
-  ![1555509031282](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1555509031282.png)
+  <img src=".\img\1555509031282.png" alt="1555509031282" style="zoom:150%;" />
 
   - 抢占式调度详解
 
@@ -4924,7 +4920,7 @@ public class Employee implements java.io.Serializable {
 
 **JVM执行main方法, main方法会进入到栈内存, JVM会找操作系统开辟一条main方法通向cpu的执行路径, cpu就可以通过这个路径来执行main方法, 这个路径就叫做main(主)线程**
 
-![1555515527209](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1555515527209.png)
+![1555515527209](.\img\1555515527209.png)
 
 ### 5. 线程
 
@@ -4934,11 +4930,11 @@ public class Employee implements java.io.Serializable {
 
 **多线程执行时，在栈内存中，其实每一个执行线程都有一片自己所属的栈内存空间。进行方法的压栈和弹栈。**
 
-![1555593287390](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1555593287390.png)
+<img src=".\img\1555593287390.png" alt="1555593287390" style="zoom:150%;" />
 
 **当执行线程的任务结束了，线程自动在栈内存中释放了。但是当所有的执行线程都结束了，那么进程就结束了。**
 
-![1555912467358](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1555912467358.png)
+<img src=".\img\1555912467358.png" alt="1555912467358" style="zoom:150%;" />
 
 - **新建状态:**
 
@@ -4997,19 +4993,19 @@ Thread.sleep()方法调用目的是不让当前线程独自霸占该进程所获
   - 使线程停止运行一段时间, 将处于**阻塞状态, 不会释放同步锁**
   - 如果调用了sleep方法之后, 没有其他等待执行的线程, 这个时候当前线程不会马上恢复执行
 - join()
-  - **阻塞**指定线程等到另一个线程完成以后可以再继续执行
+  - 当某个程序执行流中调用其他线程的 join() 方法时，**调用线程将被阻塞**，直到 join() 方法加入的 join 线程执行完为止
 - yield()
   - 让当前正在执行线程暂停, 不是阻塞线程, 而是将线程转入**就绪状态**
   - 调用了yield方法之后, 如果没有其它等待执行的线程, **此时当前线程就会马上恢复执行**
 - wait()
-  - 导致当前的线程等待，直到其他线程调用此对象的 notify() 方法或 notifyAll() 唤醒方法。这个两个唤醒方法也是Object类中的方法，行为等价于调用 wait(0) 一样。
+  - 导致当前的线程等待，直到其他线程调用此对象的 notify() 方法或 notifyAll() 唤醒方法。这个两个唤醒方法也是Object类中的方法，行为等价于调用 wait(0) 一样。	
 - notify()
   - 唤醒在此对象监视器上等待的单个线程。如果所有线程都在此对象上等待，则会选择唤醒其中一个线程。选择是任意性的，并在对实现做出决定时发生。线程通过调用其中一个 wait 方法，在对象的监视器上等待。 直到当前的线程放弃此对象上的锁定，才能继续执行被唤醒的线程。**被唤醒的线程将以常规方式与在该对象上主动同步的其他所有线程进行竞争；**例如，唤醒的线程在作为锁定此对象的下一个线程方面没有可靠的特权或劣势。类似的方法还有一个notifyAll()，**唤醒在此对象监视器上等待的所有线程。**
 - setDaemon()
   - 可以将指定的线程设置成后台线程, **守护线程**;
   - 创建用户线程的线程结束时, 后台线程也随之消亡;
   - 只能在线程启动之前把他为后台线程
-- setPriority(int newPriority)  getPriority()
+- setPriority(int newPriority) ；getPriority()
   - 线程的优先级代表的是**概率**
   - 范围从1到10, 默认为5
 - stop() 停止使用
@@ -5017,8 +5013,7 @@ Thread.sleep()方法调用目的是不让当前线程独自霸占该进程所获
 
 **设置线程名字:**
 
-- 设置线程名称有两种方式, 一种是开启线程(执行run方法)前, 使用`setName(String name)`, 一种是通过构造方
-- 法来设置, 在继承Thread类的类中的构造方法中`super(String name) = Thread(String name)`
+- 设置线程名称有两种方式, 一种是开启线程(执行run方法)前, 使用`setName(String name)`, 一种是通过构造方法来设置, 在继承Thread类的类中的构造方法中`super(String name) = Thread(String name)`
 
 #### 3. 创建线程一Thread
 
@@ -5072,7 +5067,7 @@ public class MyThread extends Thread {
 }
 ```
 
-![1555592299397](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1555592299397.png)
+<img src=".\img\1555592299397.png" alt="1555592299397" style="zoom:250%;" />
 
 #### 4. 创建线程二Runnable
 
@@ -5086,9 +5081,9 @@ public class MyThread extends Thread {
 
 **实现Runnable接口创建对线程程序的好处;**
 
-1. 避免了单继承的局限性
+1. **避免了单继承的局限性**
 2. 增加了程序的扩展性, 降低了程序的耦合度(解耦)
-   1. 实现Runnable接口的方式, **把设置线程任务和开启新线程进行了分理(解耦)**
+   1. 实现Runnable接口的方式, **把设置线程任务和开启新线程进行了分离(解耦)**
    2. 实现类中,  重写了run方法: 用来设置线程任务
    3. 创建Thread对象, 调用start方法: 用来开启新线程
 
@@ -5305,7 +5300,7 @@ class Timer {
 
 #### 3. Lock类
 
-`Lock`实现提供比使用`synchronized`方法和语句可以获得的更广泛的锁定操作。
+**`Lock`实现提供比使用`synchronized`方法和语句可以获得的更广泛的锁定操作。**
 
 主要目的是和synchronized一样， 两者都是为了解决同步问题，处理资源争端而产生的技术。功能类似但有一些区别。
 
@@ -5313,13 +5308,23 @@ class Timer {
 
 ```
   lock更灵活，可以自由定义多把锁的枷锁解锁顺序（synchronized要按照先加的后解顺序）
-  提供多种加锁方案，lock 阻塞式, trylock 无阻塞式, lockInterruptily 可打断式， 还有trylock的带超时时间版本。
+  提供多种加锁方案，lock 阻塞式, trylock 无阻塞式, lockInterruptily 可打断式， 还有trylock的带   超时时间版本。
   本质上和监视器锁（即synchronized是一样的）
   能力越大，责任越大，必须控制好加锁和解锁，否则会导致灾难。
   和Condition类的结合。
 ```
 
-Lock锁也称为同步锁, 加锁与释放锁方法如下:
+- Lock是显式锁（手动开启和关闭锁），又叫重复锁，synchronized是隐式锁，出了作用域自动释放；
+- Lock只有代码块锁，synchronized有方法锁和代码块锁；
+- **使用Lock锁，JVM将花费较少的时间来调度线程**，性能更好。并且具有更好的扩展性；
+
+**构造方法如下：**
+
+`new ReentrantLock()`：源码中是执行的`new NonfairSync()`。**同步对象，用于非公平锁，即线程执行是无序的;**
+
+`new ReentrantLock(Boolean fair)`：**参数为true，执行的是`new FairSync()`。为公平锁同步对象，线程执行是有序的；参数为false，执行`new NonfairSync()`**
+
+**Lock锁也称为同步锁, 加锁与释放锁方法如下:**
 
 - `public void lock()` :加同步锁
 - `public void unlock()` :释放同步锁
@@ -5374,7 +5379,7 @@ public class Ticket implements Runnable{
 
 #### 阻塞状态
 
-![](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1556113314786.png)
+<img src=".\img\1556113314786.png" style="zoom:150%;" />
 
 ##### 计时等待(其他阻塞): 
 
@@ -5382,19 +5387,19 @@ public class Ticket implements Runnable{
 
 **线程加入：join()方法**，等待其他线程终止。在当前线程中调用另一个线程的join()方法，则当前线程转入阻塞状态，直到另一个进程运行结束，当前线程再由阻塞转为就绪状态。
 
-![](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1556113512777.png)
+![](.\img\1556113512777.png)
 
 ##### 无限等待(等待阻塞): 
 
 **线程等待：Object类中的wait()方法**，导致当前的线程等待，直到其他线程调用此对象的 notify() 方法或 notifyAll() 唤醒方法。这个两个唤醒方法也是Object类中的方法，行为等价于调用 wait(0) 一样。
 
-![](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1556113602119.png)
+![](.\img\1556113602119.png)
 
 ##### 锁阻塞(同步阻塞):
 
 **线程在获取synchronized同步锁失败（因为锁被其他线程占用），它会进入同步阻塞状态。**
 
-![1556115653109](E:\软件开发资料\Java\Java资料\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1556115653109.png)
+<img src=".\img\1556115653109.png" alt="1556115653109" style="zoom:150%;" />
 
 
 
@@ -5404,7 +5409,16 @@ public class Ticket implements Runnable{
 
 ### 8.死锁
 
+- **不同的线程分别占用对方需要的同步资源不放弃，都在等对方放弃自己需要的同步资源，就形成了线程的死锁；**
+- **出现死锁后，不会出现异常，不会出现提示，只是所有的线程都处于堵塞状态，无法继续；**
 
+![1569747524875](.\img\1569747524875.png)
+
+**解决办法：**
+
+- 专门的算法，原则
+- 尽量减**少同步资源的定义**
+- 尽量**避免嵌套同步**
 
 ### 9. 等待唤醒机制
 
@@ -5414,7 +5428,7 @@ public class Ticket implements Runnable{
 
 比如：线程A用来生成包子的，线程B用来吃包子的，包子可以理解为同一资源，线程A与线程B处理的动作，一个是生产，一个是消费，那么线程A与线程B之间就存在线程通信问题。
 
-![1556543411245](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1556543411245.png)
+<img src=".\img\1556543411245.png" alt="1556543411245" style="zoom:150%;" />
 
 **为什么要处理线程间通信：**
 
@@ -5606,7 +5620,7 @@ public class Demo {
 
 **线程池：**其实就是一个容纳多个线程的容器，其中的线程可以反复使用，省去了频繁创建线程对象的操作，无需反复创建线程而消耗过多资源。
 
-![1556544232259](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1556544232259.png)
+<img src=".\img\1556544232259.png" alt="1556544232259" style="zoom:150%;" />
 
 合理利用线程池能够带来三个好处：
 
@@ -5689,9 +5703,9 @@ public class ThreadPoolDemo {
 - 线程对变量进行修改后, 要立刻回写到主内存.
 - 线程对变量读取的时候, 要从主内存中读, 而不是缓存
 
-![1556978009056](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1556978009056.png)
+![1556978009056](.\img\1556978009056.png)
 
-![1556978500027](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1556978500027.png)
+![1556978500027](.\img\1556978500027.png)
 
 原子性: 事务中各项操作，要么全做要么全不做，任何一项操作的失败都会导致整个事务的失败；
 
