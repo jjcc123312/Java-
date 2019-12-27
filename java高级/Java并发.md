@@ -48,13 +48,13 @@ AQS通过内置的`FIFO`同步队列来完成资源获取线程的排队工作�
 
 **公平锁是指多线程按照申请锁的顺序来获取锁，非公平锁指多个线程获取锁的顺序不是按照申请锁的顺序**，有可能造成优先级反转或者饥饿现象。
 
-**非公平锁的优点在于比公平锁吞吐量大**，ReentrantLock默认非公平锁，可以通过构造函数选择公平锁，Synchronized是非公平锁。
+**非公平锁的优点在于比公平锁吞吐量大**，`ReentrantLock`默认非公平锁，可以通过构造函数选择公平锁，`Synchronized`是非公平锁。
 
 **公平与非公平获取锁的区别** ：
 
 公平性与否是针对获取锁而言的，如果一个锁是公平的，那么**锁的获取顺序就应该符合请求的绝对时间顺序**，也就是 **FIFO**。 
 
-对于上非公平锁实现的`nonfairTryAcquire(int acquires)`，只要 **CAS** 设置同步状态成功，即获取到锁，而公平锁则不同，如下： 
+对于非公平锁实现的`nonfairTryAcquire(int acquires)`，只要 **CAS** 设置同步状态成功，即获取到锁，而公平锁则不同，如下： 
 
 ```java
 protected final boolean tryAcquire(int acquires) {
@@ -84,7 +84,7 @@ protected final boolean tryAcquire(int acquires) {
 
 > **可重入锁**
 
-ReentrantLock与synchronized都是可重入的。
+`ReentrantLock`与`synchronized`都是可重入的。
 
 就是支持重进入的锁，它表示该锁能够支持 **一个线程对资源的重复加锁**。除此之外，该锁的还支持获取锁时的公平和非公平性选择。 
 
@@ -113,11 +113,11 @@ void m2() {
 }
 ```
 
-假如 lock 是不可重入锁，那么上面的示例代码必然会引起死锁情况的发生。这里请大家思考一个问题，ReentrantLock 的可重入特性是怎样实现的呢？简单说一下，ReentrantLock 内部是通过 AQS 实现同步控制的，AQS 有一个变量 `state` 用于记录同步状态。初始情况下，state = 0，表示 ReentrantLock 目前处于解锁状态。如果有线程调用 lock 方法进行加锁，state 就由0变为1，如果该线程再次调用 lock 方法加锁，就让其自增，即 state++。线程每调用一次 unlock 方法释放锁，会让 state--。通过查询 state 的数值，即可知道 ReentrantLock 被重入的次数了。这就是可重复特性的大致实现流程。 
+假如 `lock` 是不可重入锁，那么上面的示例代码必然会引起死锁情况的发生。这里请大家思考一个问题，`ReentrantLock` 的可重入特性是怎样实现的呢？简单说一下，`ReentrantLock` 内部是通过 AQS 实现同步控制的，AQS 有一个变量 `state` 用于记录同步状态。初始情况下，state = 0，表示 `ReentrantLock` 目前处于解锁状态。如果有线程调用 `lock` 方法进行加锁，`state` 就由0变为1，如果该线程再次调用 `lock` 方法加锁，就让其自增，即 `state++`。线程每调用一次 `unlock` 方法释放锁，会让 `state--`。通过查询 state 的数值，即可知道 `ReentrantLock` 被重入的次数了。这就是可重复特性的大致实现流程。 
 
 > **独享锁/共享锁**
 
-**独享锁是指一个锁只能一个线程独有，共享锁指一个锁可被多个线程共享**； JUC中`ReentrantLock`与`CyclicBarrier`为独占锁，`CountDownLatch`与`Semaphore`为共享锁，ReentrantReadWriteLock中`writeLock`为独占锁，`ReadLock`为共享锁。 
+**独享锁是指一个锁只能一个线程独有，共享锁指一个锁可被多个线程共享**； JUC中`ReentrantLock`与`CyclicBarrier`为独占锁，`CountDownLatch`与`Semaphore`为共享锁，`ReentrantReadWriteLock`中`writeLock`为独占锁，`ReadLock`为共享锁。 
 
 独占锁与共享锁的区别：
 
@@ -158,11 +158,11 @@ void m2() {
 
 ReentrantLock，可重入锁，**是一种递归无阻塞的同步机制**。它等同于`Synchronized`的使用，但是ReentrantLock提供了比`synchronized`更强大的锁机制，可以减少死锁发生的概率。
 
-> 虽然它缺少了（通过`synchronized`块或者方法所提供的）隐式获取释放锁的便捷性，但是却拥有了锁获取与释放的 **可操作性**、**可中断的获取锁** 以及 **超时获取锁** 等多种`synchronized`关键字所不具备的同步特性。
+> 虽然它缺少了（通过`synchronized`块或者方法所提供的）隐式获取释放锁的便捷性，但是却拥有了**锁获取与释放的 可操作性、可中断的获取锁 以及 超时获取锁 等多种`synchronized`关键字所不具备的同步特性**。
 >
 > 使用`synchronized`关键字将会 **隐式** 地获取锁，但是它将锁的获取和释放固化了，也就是先获取再释放。 
 
-ReentrantLock 还提供了**公平锁**和**非公平锁**的选择，**通过构造方法接受一个可选的 `fair` 参数（默认非公平锁）：当设置为 true 时，表示公平锁；否则为非公平锁**。 
+`ReentrantLock` 还提供了**公平锁**和**非公平锁**的选择，**通过构造方法接受一个可选的 `fair` 参数（默认非公平锁）：当设置为 true 时，表示公平锁；否则为非公平锁**。 
 
 **公平锁与非公平锁的区别在于，公平锁的锁获取是有顺序的。但是公平锁的效率往往没有非公平锁的效率高，在许多线程访问的情况下，公平锁表现出较低的吞吐量。** 
 
@@ -170,8 +170,8 @@ ReentrantLock 还提供了**公平锁**和**非公平锁**的选择，**通过�
 
  ![201702010001](E:\软件开发资料\Java\Java资料\java高级\Java并发.assets\201812081321001-1574580030822-1574581143927.png) 
 
-- ReentrantLock 实现 Lock 接口，基于内部的 Sync 实现。
-- Sync 实现 AQS ，提供了 FairSync 和 NonFairSync 两种实现。
+- `ReentrantLock` 实现 `Lock` 接口，基于内部的 `Sync` 实现。
+- `Sync` 实现 `AQS` ，提供了 `FairSync` 和 `NonFairSync` 两种实现。
 
 #### 2.1.2、构造声明
 
@@ -217,24 +217,25 @@ class X {
 
  `java.util.concurrent.locks.Lock` 接口，定义方法如下： 
 
-```csharp
+```java
 void lock();
 void lockInterruptibly() throws InterruptedException;boolean tryLock();
 boolean tryLock(long time, TimeUnit unit) throws InterruptedException;
-void unlock();Condition newCondition();`
+void unlock();
+Condition newCondition();
 ```
 
 `void lock();`：获取锁，获取之后返回
 
 `void lockInterruptibly() throws InterruptedException;`：可中断的获取锁，和`lock()`方法不同之处在于该方法会响应中断，即在锁的获取中可以中断当前线程。
 
-`boolean tryLock();`：尝试非阻塞的获取锁，调用该方法后立即返回，如果能够获取则返回true，否则返回flase。
+`boolean tryLock();`：尝试非阻塞的获取锁，调用该方法后立即返回，如果能够获取则返回true，否则返回flase然后进入AQS同步队列等待唤醒获取锁资源。
 
-`boolean tryLock(long time, TimeUnit unit) throws InterruptedException;`： 超时获取锁。 超时时间结束，未获得锁，返回`false`。**当前线程在以下3种情况下会返回：①当前线程在超时时间内获得了锁②当前线程在超时时间内被中断③超时时间结束，返回flase;**
+`boolean tryLock(long time, TimeUnit unit) throws InterruptedException;`： 超时获取锁。 超时时间结束，未获得锁，返回`false`。**当前线程在以下3种情况下会返回：①当前线程在超时时间内获得了锁②当前线程在超时时间内被中断③超时时间结束没获取到锁，返回flase;**
 
 `void unlock();`：释放锁
 
- `Condition newCondition();`：获取等待通知组件，改组件和锁绑定，当前线程获取到锁才能调用`wait()`方法，调用之后则会释放锁。  
+ `Condition newCondition();`：获取等待通知组件，该组件和锁绑定，当前线程获取到锁才能调用`wait()`方法，调用之后则会释放锁。  
 
 ### 2.2、ReentrantReadWriteLock
 
@@ -242,15 +243,15 @@ void unlock();Condition newCondition();`
 
 重入锁`ReentrantLock`是排他锁，**排他锁在同一时刻仅有一个线程可以访问**，但是在大多数场景下，**大部分时间都是提供读服务，而写服务占有的时间较少**。然而，读服务不存在数据竞争问题，如果一个线程在读时禁止其它线程读势必会导致性能降低。所以就提供了读写锁。**读写锁** 能够提供比 **排它锁** 更好的 **并发性** 和 **吞吐量**。 
 
-读写锁维护着**一对**锁，一个读锁和一个写锁。通过分离读锁和写锁，使得并发性比一般的排他锁有了较大的提高；
+读写锁维护着**一对**锁，一个读锁和一个写锁。**通过分离读锁和写锁，使得并发性比一般的排他锁有了较大的提高；**
 
 - 在同一时间，可以允许多个读线程同时访问。
-- 但是，**在写线程时，所有读线程和写线程都会被阻塞**。
+- 但是，**在写线程时，所有读线程(获取读锁的线程)和写线程(获取写锁的线程)都会被阻塞**。
 
 读写锁的**主要特性**： 
 
 -  **公平性选择** ：支持公平和非公平的方式获取锁，吞吐量非公平优于公平。
--  **重进入** ： **读锁在获取锁之后可以再获取读锁；写锁在获取锁之后可以再获取读锁和写锁**。 读写锁最多支持 65535 个递归写入锁和 65535 个递归读取锁。 
+-  **重进入** ： **线程在获取读锁之后可以再获取读锁；线程在获取写锁之后可以再获取读锁和写锁**。 读写锁最多支持 65535 个递归写入锁和 65535 个递归读取锁。 
 -  **锁降级** ：先获取**写锁**，然后获取**读锁**，最后释放**写锁**，这样写锁就降级成了**读锁**。但是，读锁不能升级到写锁。简言之，就是：**写锁可以降级成读锁，读锁不能升级成写锁。** 
 
 #### 2.2.2、ReadWriteLock
@@ -267,7 +268,7 @@ Lock writeLock();
 
 #### 2.2.3、ReentrantReadWriteLock
 
-`java.util.concurrent.locks.ReentrantReadWriteLock` ，实现 ReadWriteLock 接口，**可重入**的**读写锁**实现类。在它内部，维护了**一对**相关的锁，一个用于只读操作，另一个用于写入操作。只要没有 Writer 线程，读取锁可以由多个 Reader 线程同时保持。也就说说，**写锁是独占的，读锁是共享的**。 
+`java.util.concurrent.locks.ReentrantReadWriteLock` ，实现 `ReadWriteLock` 接口，**可重入**的**读写锁**实现类。在它内部，维护了**一对**相关的锁，一个用于只读操作，另一个用于写入操作。只要没有 `Writer` 线程，读取锁可以由多个 `Reader` 线程同时保持。也就说说，**写锁是独占的，读锁是共享的**。 
 
 相关API：
 
@@ -280,19 +281,19 @@ Lock writeLock();
 
 **Sync**
 
-ReentrantReadWriteLock的同步实现，**继承自AbstractQueuedSynchronizer，内部重写了tryRelease，tryAcquire，tryReleaseShared，tryAcquireShared，属于核心。**
+`ReentrantReadWriteLock`的同步实现，**继承自`AbstractQueuedSynchronizer`，内部重写了tryRelease，tryAcquire，tryReleaseShared，tryAcquireShared，属于核心。**
 
-**FairSync和NonfairSync**
+**`FairSync`和`NonfairSync`**
 
-公平模式与非公平模式同步器，重写了Sync类中的writerShouldBlock和readerShouldBlock方法，用于处理当前线程在获取读锁和写锁阻塞时的策略。
+公平模式与非公平模式同步器，重写了Sync类中的`writerShouldBlock`和`readerShouldBlock`方法，用于处理当前线程在获取读锁和写锁阻塞时的策略。
 
 **ReadLock**
 
-读锁的实现，重写了接口Lock中共享锁的一些方法，**内部维护的同步器与写锁是同一个同步器。不支持Condition条件队列。**
+读锁的实现，重写了接口Lock中共享锁的一些方法，**内部维护的同步器与写锁是同一个同步器。不支持`Condition`条件队列。**
 
 **WriteLock**
 
-写锁也是实现了Lock接口，但是实现了独占锁的一些方法，**内部维护的同步器和读锁的是同一个，支持Condition条件队列。**
+写锁也是实现了Lock接口，但是实现了独占锁的一些方法，**内部维护的同步器和读锁的是同一个，支持`Condition`条件队列。**
 
 #### 2.2.4、使用示例
 
@@ -411,7 +412,7 @@ asdas: value1
       Thread current = Thread.currentThread();
       //当前锁个数
       int c = getState();
-      //写锁
+      //写锁重入数
       int w = exclusiveCount(c);
       if (c != 0) {
           //c != 0 && w == 0 表示存在读锁
@@ -553,6 +554,9 @@ if (exclusiveCount(c) != 0 && getExclusiveOwnerThread() != current)
   
   `RentrantReadWriteLock`不支持锁升级。目的也是保证数据可见性，如果读锁已被多个线程获取，其中任意线程成功获取了写锁并更新了数据，则其更新对其他获取到读锁的线程是不可见（**修改与获取数据不能同时发生**）的。 
 
+
+```
+
 ### 2.3、LockSupport工具
 
 #### 2.3.1、简介
@@ -589,7 +593,7 @@ LockSupport类的核心方法其实就两个：`park()`和`unark()`，其中**`p
 
 *假设现在需要实现一种FIFO类型的独占锁，可以把这种锁看成是ReentrantLock的公平锁简单版本，且是不可重入的，就是说当一个线程获得锁后，其它等待线程以FIFO的调度方式等待获取锁。* 
 
-​```java
+```java
 public class FIFOMutex {
     private final AtomicBoolean locked = new AtomicBoolean(false);
     private final Queue<Thread> waiters = new ConcurrentLinkedQueue<Thread>();
@@ -661,7 +665,7 @@ class MyThread extends Thread {
 
 上述FIFOMutex 类的实现中，当判断锁已被占用时，会调用`LockSupport.park(this)`方法，将当前调用线程阻塞；当使用完锁时，会调用`LockSupport.unpark(waiters.peek())`方法将等待队列中的队首线程唤醒。 
 
-通过LockSupport的这两个方法，可以很方便的阻塞和唤醒线程。但是LockSupport的使用过程中还需要注意以下几点： 
+通过`LockSupport`的这两个方法，可以很方便的阻塞和唤醒线程。但是`LockSupport`的使用过程中还需要注意以下几点： 
 
 1. **`park`方法的调用一般要方法一个循环判断体里面。**
 
@@ -677,7 +681,7 @@ class MyThread extends Thread {
 
 2. `park`方法是会响应中断的，但是不会抛出异常。(也就是说如果当前调用线程被中断，则会立即返回但不会抛出中断异常)
 
-3. park的重载方法`park(Object blocker)`，会传入一个blocker对象，所谓Blocker对象，其实就是当前线程调用时所在调用对象（如上述示例中的FIFOMutex对象）。该对象一般供监视、诊断工具确定线程受阻塞的原因时使用。
+3. park的重载方法`park(Object blocker)`，会传入一个`blocker`对象，所谓Blocker对象，其实就是当前线程调用时所在调用对象（如上述示例中的FIFOMutex对象）。该对象一般供监视、诊断工具确定线程受阻塞的原因时使用。
 
 ### 2.4、Condition
 
@@ -687,7 +691,7 @@ class MyThread extends Thread {
 
 `Condition`接口也提供了类似`Object`的监视器方法，与`Lock`配合可以实现 **等待/通知** 模式，但是这两者在使用方式以及功能特性上还是有差别的。 
 
-以下是Object的监视器方法与Condition接口的对比：
+以下是`Object`的监视器方法与`Condition`接口的对比：
 
 |                        对比项                        |     Object      |                          Condition                           |
 | :--------------------------------------------------: | :-------------: | :----------------------------------------------------------: |
@@ -739,7 +743,7 @@ public void conditionSignal() throws InterruptedException {
 -  `void signal()` ：唤醒`Condition`上一个在等待的线程
 -  `void signalAll()` ：唤醒`Condition`上全部在等待的线程
 
-**获取一个Condition必须通过Lock的newCondition()方法。**
+**获取一个Condition必须通过Lock的`newCondition()`方法。**
 
 通过下面这个有界队列的示例我们来深入了解下 `Condition` 的使用方式:
 
@@ -796,7 +800,7 @@ public class BoundedQueue<T> {
 上述代码`add` 和 `remove` 方法 都需要先获取锁保证数据的可见性和排它性。
 当储存数组满了的时候时候调用`notFull.await()`，线程即释放锁并进入等待队列。
 当储存数组未满时，则添加到数组，并通知 `notEmpty` 中等待的线程。
-方法中使用`while`循环是为了防止过早或者意外的通知。
+**方法中使用`while`循环是为了防止过早或者意外的通知。**
 
 #### 2.4.3、Condition的实现分析
 
@@ -865,7 +869,7 @@ public class BoundedQueue<T> {
 
   - 首先，将当前线程新建一个节点同时加入到条件队列中。
   - 然后，释放当前线程持有的同步状态。
-  - 之后，则是**不断**检测该节点代表的线程，出现在 CLH 同步队列中（收到 signal 信号之后，就会在 AQS 队列中检测到），如果不存在则一直**挂起**。
+  - 之后，则是**不断**检测该节点代表的线程，出现在 CLH 同步队列中（收到 `signal` 信号之后，就会在 AQS 队列中检测到），如果不存在则一直**挂起**。
   - 最后，**重新**参与竞争，获取到同步状态。
   - **注意**： 如果不是通过其他线程调用`Condition.signal()`方法唤醒，而是对等待线程进行中断，则会抛出`InterruptedException`。 
 
@@ -912,9 +916,9 @@ public class BoundedQueue<T> {
 
 ### 1.1、简介
 
-`ConcurrentHashMap`是在JDK1.5时，J.U.C引入的一个同步集合工具类，顾名思义，这是一个线程安全的HashMap。不同版本的ConcurrentHashMap，内部实现机制千差万别，本节所有的讨论基于JDK1.8。
+`ConcurrentHashMap`是在JDK1.5时，J.U.C引入的一个同步集合工具类，顾名思义，这是一个线程安全的`HashMap`。不同版本的`ConcurrentHashMap`，内部实现机制千差万别，本节所有的讨论基于JDK1.8。
 
-**ConcurrentHashMap**的类继承关系并不复杂：
+**`ConcurrentHashMap`**的类继承关系并不复杂：
 
  ![clipboard.png](E:\软件开发资料\Java\Java资料\java高级\Java并发.assets\as1d55as142334)
 
@@ -936,13 +940,13 @@ public class BoundedQueue<T> {
 
 `transient volatile Node[] table;`
 
-数组的每一个位置`table[i]`代表了一个桶，当插入键值对时，会根据键的hash值映射到不同的桶位置，table一共可以包含**4种不同类型**的桶：**Node**、**TreeBin**、**ForwardingNode**、**ReservationNode**。上图中，不同的桶用不同颜色表示。可以看到，有的桶链接着**链表**，有的桶链接着**树**，这也是JDK1.8中ConcurrentHashMap的特殊之处 。
+数组的每一个位置`table[i]`代表了一个桶，当插入键值对时，会根据键的hash值映射到不同的桶位置，table一共可以包含**4种不同类型**的桶：**Node**、**TreeBin**、**ForwardingNode**、**ReservationNode**。上图中，不同的桶用不同颜色表示。可以看到，有的桶链接着**链表**，有的桶链接着**树**，这也是JDK1.8中`ConcurrentHashMap`的特殊之处 。
 
-需要注意的是：**TreeBin**所链接的是一颗红黑树，红黑树的结点用**TreeNode**表示，所以ConcurrentHashMap中实际上一共有**五种不同类型**的Node结点。 
+需要注意的是：**TreeBin**所链接的是一颗红黑树，红黑树的结点用**TreeNode**表示，所以`ConcurrentHashMap`中实际上一共有**五种不同类型**的**Node结点**。 
 
-*之所以用**TreeBin**而不是直接用**TreeNode**，是因为红黑树的操作比较复杂，包括构建、左旋、右旋、删除，平衡等操作，用一个代理结点TreeBin来包含这些复杂操作，其实是一种“职责分离”的思想。另外TreeBin中也包含了一些加/解锁的操作。*   
+*之所以用**`TreeBin`**而不是直接用**`TreeNode`**，是因为红黑树的操作比较复杂，包括构建、左旋、右旋、删除，平衡等操作，用一个代理结点`TreeBin`来包含这些复杂操作，其实是一种“职责分离”的思想。另外`TreeBin`中也包含了一些加/解锁的操作。*  
 
-> 在**JDK1.8之前，ConcurrentHashMap采用了分段锁的设计思路，以减少热点域的冲突。JDK1.8时不再延续， 而是利用 CAS + Synchronized 来保证并发更新的安全**，转而直接对每个桶加锁，并用“红黑树”链接冲突结点。关于红黑树和一般HashMap的实现思路。
+> 在**JDK1.8之前，`ConcurrentHashMap`采用了分段锁的设计思路，以减少热点域的冲突。JDK1.8时不再延续， 而是利用 `CAS + Synchronized块` 来保证并发更新的安全**，转而直接对每个桶加锁，并用“红黑树”链接冲突结点。
 
 #### 1.2.2、节点定义
 
@@ -951,7 +955,7 @@ public class BoundedQueue<T> {
   Node结点的定义非常简单，也是其它四种类型结点的父类。
 
   > 默认链接到`table[i]`——桶上的结点就是Node结点。
-  > 当出现hash冲突时，Node结点会首先以**链表**的形式链接到table上，当结点数量超过一定数目时，链表会转化为红黑树。因为链表查找的平均时间复杂度为`O(n)`，而红黑树是一种平衡二叉树，其平均时间复杂度为`O(logn)`。 
+  > 当出现hash冲突时，Node结点会首先以**链表**的形式链接到table上，当结点数量超过一定数目(8)时，链表会转化为红黑树。因为链表查找的平均时间复杂度为`O(n)`，而红黑树是一种平衡二叉树，其平均时间复杂度为`O(logn)`。 
 
 - **TreeNode节点**
 
@@ -981,7 +985,7 @@ public class BoundedQueue<T> {
 
 **ConcurrentHashMap**提供了**五个构造器**，这五个构造器内部最多也只是计算了下table的初始容量大小，并没有进行实际的创建table数组的工作： 
 
-> ConcurrentHashMap，采用了一种**“懒加载”**的模式，只有到**首次插入键值对**的时候，才会真正的去初始化table数组。 
+> `ConcurrentHashMap`，采用了一种**“懒加载”**的模式，只有到**首次插入键值对**的时候，才会真正的去初始化table数组。 
 
 **空构造器**
 
@@ -1010,7 +1014,7 @@ public ConcurrentHashMap(int initialCapacity) {
 
 **指定table初始容量、负载因子、并发级别的构造器**
 
-注意：**concurrencyLevel只是为了兼容JDK1.8以前的版本，并不是实际的并发级别，loadFactor也不是实际的负载因子**
+注意：**`concurrencyLevel`只是为了兼容JDK1.8以前的版本，并不是实际的并发级别，loadFactor也不是实际的负载因子**
 
 ```java
 /**
@@ -1268,32 +1272,30 @@ private final Node<K, V>[] initTable() {
 
   `HashTable`容器使用`synchronized`来保证线程安全，但在线程竞争激烈的情况下`HashTable`的效率非常低下。因为**当一个线程访问`HashTable`的同步方法，其他线程也访问`HashTable`的同步方法时，会进入阻塞或轮询状态**。如`线程1`使用`put`进行元素添加，`线程2`不但不能使用`put`方法添加元素，也不能使用`get`方法来获取元素，所以竞争越激烈效率越低。
 
-
-
 ## 2、ConcurrentSkipListMap
 
 ### 2.1、ConcurrentSkipListMap简介
 
-ConcurrentSkipListMap的类继承图： 
+`ConcurrentSkipListMap`的类继承图： 
 
  ![clipboard.png](E:\软件开发资料\Java\Java资料\java高级\Java并发.assets\4sd58f8sd4f8s)
 
-我们知道，一般的Map都是无序的，也就是只能通过键的hash值进行定位。JDK为了实现有序的Map，提供了一个**SortedMap**接口，SortedMap提供了一些根据键范围进行查找的功能，比如返回整个Map中 key最小/大的键、返回某个范围内的子Map视图等等。
+我们知道，一般的Map都是无序的，也就是只能通过键的hash值进行定位。JDK为了实现有序的Map，提供了一个**`SortedMap`**接口，`SortedMap`提供了一些根据键范围进行查找的功能，比如返回整个Map中 key最小/大的键、返回某个范围内的子Map视图等等。
 
-为了进一步对有序Map进行增强，JDK又引入了**NavigableMap**接口，该接口进一步扩展了SortedMap的功能，提供了根据指定Key返回最接近项、按升序/降序返回所有键的视图等功能。
+为了进一步对有序Map进行增强，JDK又引入了**`NavigableMap`**接口，该接口进一步扩展了`SortedMap`的功能，提供了根据指定Key返回最接近项、按升序/降序返回所有键的视图等功能。
 
-同时，也提供了一个基于NavigableMap的实现类——**TreeMap**，TreeMap底层基于红黑树设计，是一种有序的Map。
+同时，也提供了一个基于`NavigableMap`的实现类——**`TreeMap`**，`TreeMap`底层基于红黑树设计，是一种有序的`Map`。
 
 我们在Java世界里看到了两种实现key-value的数据结构：`Hash`、`TreeMap`，这两种数据结构各自都有着优缺点。
 
 1. Hash表：插入、查找最快，为O(1)；如使用链表实现则可实现无锁；数据有序化需要显式的排序操作。
 2. 红黑树：插入、查找为O(logn)，但常数项较小；无锁实现的复杂性很高，一般需要加锁；数据天然有序。
 
-然而，这次介绍第三种实现key-value的数据结构：SkipList。SkipList有着不低于红黑树的效率，但是其原理和实现的复杂度要比红黑树简单多了。
+然而，这次介绍第三种实现key-value的数据结构：`SkipList`。`SkipList`有着不低于红黑树的效率，但是其原理和实现的复杂度要比红黑树简单多了。
 
  ![clipboard.png](E:\软件开发资料\Java\Java资料\java高级\Java并发.assets\ssdsd54821sad42) 
 
-J.U.C提供了基于**ConcurrentNavigableMap**接口的一个实现——`ConcurrentSkipListMap`。ConcurrentSkipListMap可以看成是并发版本的`TreeMap`，但是和`TreeMap`不同是，`ConcurrentSkipListMap`并不是基于红黑树实现的，其底层是一种类似**跳表（Skip List）**的结构。  
+J.U.C提供了基于**`ConcurrentNavigableMap`**接口的一个实现——`ConcurrentSkipListMap`。`ConcurrentSkipListMap`可以看成是并发版本的`TreeMap`，但是和`TreeMap`不同是，`ConcurrentSkipListMap`并不是基于红黑树实现的，其底层是一种类似**跳表（Skip List）**的结构。  
 
 ### 2.2、SkipList跳跃列表
 
@@ -1309,11 +1311,11 @@ J.U.C提供了基于**ConcurrentNavigableMap**接口的一个实现——`Concur
 
 跳表，它是一种可以替代平衡树的数据结构，**其数据元素默认按照key值升序，天然有序**。Skip list让已排序的数据分布在多层链表中，以0-1随机数决定一个数据的向上攀升与否，通过“空间来换取时间”的一个算法，在每个节点中增加了向前的指针**，在插入、删除、查找时可以忽略一些不可能涉及到的结点，从而提高了效率**。 
 
-**使用CAS+自旋保证线程安全的；**
+**使用CAS+自旋保证线程安全；**
 
 ####  2.2.2、SkipList的特性
 
-1. 由很多层结构组成，level( 层数 )是通过一定的概率随机产生的，有一个最大层数**MAX_LEVEL**限制 
+1. 由很多层结构组成，`level`( 层数 )是通过一定的概率随机产生的，有一个最大层数**MAX_LEVEL**限制 
 2. **每一层都是一个有序的链表，默认是升序**，也可以根据创建映射时所提供的Comparator进行排序，具体取决于使用的构造方法
 3. 最底层(Level 1)的链表包含所有元素
 4. 如果一个元素出现在`Level i` 的链表中，则它在`Level i` 之下的链表也都会出现
@@ -1361,7 +1363,7 @@ SkipList的插入操作主要包括：
 
 **如果层次 K = 2**，直接在Level 2 层插入即可 
 
- ![201707090006](E:\软件开发资料\Java\Java资料\java高级\Java并发.assets\2018120824006.png)
+ ![201707090006](.\Java并发.assets\2018120824006.png)
 
 #### 2.2.5、SkipList的删除
 
@@ -1540,10 +1542,19 @@ public V put(K key, V value) {
  doPut() 方法：
 
 ```java
-`private V doPut(K key, V value, boolean onlyIfAbsent) {    Node z;             // added node    if (key == null)        throw new NullPointerException();    // 比较器    Comparator cmp = comparator;    outer: for (;;) {        for (Node b = findPredecessor(key, cmp), n = b.next; ; ) {        /** 省略代码 */`
+`private V doPut(K key, V value, boolean onlyIfAbsent) {    
+    Node z;             // added node    
+    if (key == null)        
+        throw new NullPointerException();    
+    // 比较器    
+    Comparator cmp = comparator;    
+    outer: 
+    for (;;) {        
+        for (Node b = findPredecessor(key, cmp), n = b.next; ; ) {        
+            /** 省略代码 */`
 ```
 
-`#doPut()`方法有三个参数，除了key，value外还有一个boolean类型的onlyIfAbsent，该参数作用与如果存在当前key时，该做何动作。当onlyIfAbsent为false时，替换value，为true时，则返回该value。用代码解释为： 
+`#doPut()`方法有三个参数，除了key，value外还有一个boolean类型的`onlyIfAbsent`，该参数作用与如果存在当前key时，该做何动作。当onlyIfAbsent为false时，替换value，为true时，则返回该value。用代码解释为： 
 
 ```java
  if (!map.containsKey(key))
@@ -1610,14 +1621,14 @@ private Node<K, V> findPredecessor(Object key, Comparator<? super K> cmp) {
 
 **总结：**
 
-1. 首先通过findPredecessor()方法找到前辈节点Node
-2. 根据返回的前辈节点以及key-value，新建Node节点，同时通过CAS设置next
-3. 设置节点Node，再设置索引节点。采取抛硬币方式决定层次，如果所决定的层次大于现存的最大层次，则新增一层，然后新建一个Item链表。
-4. 最后，将新建的Item链表插入到SkipList结构中。
+1. 首先通过`findPredecessor()`方法找到前辈节点`Node`
+2. 根据返回的前辈节点以及`key-value`，新建Node节点，同时通过`CAS`设置`next`
+3. 设置节点`Node`，再设置索引节点。采取抛硬币方式决定层次，如果所决定的层次大于现存的最大层次，则新增一层，然后新建一个Item链表。
+4. 最后，将新建的Item链表插入到`SkipList`结构中。
 
 #### 2.4.2、remove操作
 
-**ConcurrentSkipListMap**在删除键值对时，不会立即执行删除，而是通过引入**“标记结点”**，以**“懒删除”**的方式进行，以提高并发效率。 
+**`ConcurrentSkipListMap`**在删除键值对时，不会立即执行删除，而是通过引入**“标记结点”**，以**“懒删除”**的方式进行，以提高并发效率。 
 
 ```java
 public V remove(Object key) {
@@ -1698,17 +1709,73 @@ final V doRemove(Object key, Object value) {
    }
 ```
 
-调用findPredecessor()方法找到前辈节点，然后通过右移，然后比较，找到后利用CAS把value替换为null，然后判断该节点是不是这层唯一的index，如果是的话，调用tryReduceLevel()方法把这层干掉，完成删除。
+调用`findPredecessor()`方法找到前辈节点，然后通过右移，然后比较，找到后利用CAS把value替换为null，然后判断该节点是不是这层唯一的index，如果是的话，调用tryReduceLevel()方法把这层干掉，完成删除。
 
-其实从这里可以看出，**remove方法仅仅是把Node的value设置null，并没有真正删除该节点Node**，其实从上面的put操作、get操作我们可以看出，他们在寻找节点的时候都会判断节点的value是否为null，如果为null，则调用unLink()方法取消关联关系，如下：
+其实从这里可以看出，**remove方法仅仅是把Node的value设置null，并没有真正删除该节点Node**，其实**从上面的put操作、get操作我们可以看出，他们在寻找节点的时候都会判断节点的value是否为null，如果为null，则调用`unLink()`方法取消关联关系**，如下：
 
 ```java
-`if (n.value == null) {    if (!q.unlink(r))        break;           // restart    r = q.right;         // reread r    continue;}`
+if (n.value == null) {    
+    if (!q.unlink(r))        
+        break;           // restart    
+    r = q.right;         // reread r    
+    continue;
+}
 ```
 
 #### 2.4.3、get操作
 
+最后，我们来看下`ConcurrentSkipListMap`的查找操作——get方法。
 
+```java
+public V get(Object key) {
+    return doGet(key);
+}
+```
+
+内部调用了**doGet**方法：
+
+```java
+private V doGet(Object key) {
+    if (key == null)
+        throw new NullPointerException();
+    Comparator<? super K> cmp = comparator;
+    outer:
+    for (; ; ) {
+
+        // b指向“小于且最接近给定key”的Node结点(或底层链表头结点)
+        for (Node<K, V> b = findPredecessor(key, cmp), n = b.next; ; ) {
+            Object v;
+            int c;
+            if (n == null)
+                break outer;
+            Node<K, V> f = n.next;          // b -> n -> f
+            if (n != b.next)
+                break;
+            if ((v = n.value) == null) {    // n is deleted
+                n.helpDelete(b, f);
+                break;
+            }
+            if (b.value == null || v == n)  // b is deleted
+                break;
+            if ((c = cpr(cmp, key, n.key)) == 0) {
+                V vv = (V) v;
+                return vv;
+            }
+            if (c < 0)
+                break outer;
+            b = n;
+            n = f;
+        }
+    }
+    return null;
+}
+```
+
+doGet方法非常简单：
+
+首先找到“小于且最接近给定key”的Node结点，然后用了三个指针：b -> n -> f，
+n用于定位最终查找的Key，然后顺着链表一步步向下查，比如查找KEY==45，则最终三个指针的位置如下：
+![clipboard.png](.\img\2423797303-5b869d91f18c2_articlex.png)
 
 ## 3、ConcurrentSkipListSet
 
@@ -1722,11 +1789,9 @@ public boolean add(E e) {
 }
 ```
 
-我们知道**ConcurrentSkipListMap**对键值对的要求是均不能为null，所以ConcurrentSkipListSet在插入元素的时候，用一个`Boolean.TRUE`对象（相当于一个值为true的Boolean型对象）作为value，同时`putIfAbsent`可以保证不会存在相同的Key。
+我们知道**`ConcurrentSkipListMap`**对键值对的要求是均不能为null，所以ConcurrentSkipListSet在插入元素的时候，用一个`Boolean.TRUE`对象（相当于一个值为true的Boolean型对象）作为value，同时`putIfAbsent`可以保证不会存在相同的Key。
 
 所以，最终跳表中的所有Node结点的Key均不会相同，且值都是`Boolean.True`。
-
-
 
 ## 4、CopyOnWriteArrayList和CopyOnWriteArraySet
 
@@ -1739,10 +1804,10 @@ public boolean add(E e) {
 **CopyOnWriteArrayList**的思想和实现整体上还是比较简单，它适用于处理**“读多写少”**的并发场景。
 
 **1. 内存的使用**
-由于CopyOnWriteArrayList使用了“写时复制”，所以在进行写操作的时候，内存里会同时存在两个array数组，如果数组内存占用的太大，那么可能会造成频繁GC,所以CopyOnWriteArrayList并不适合大数据量的场景。
+由于`CopyOnWriteArrayList`使用了“写时复制”，所以**在进行写操作的时候，内存里会同时存在两个array数组，如果数组内存占用的太大，那么可能会造成频繁GC,所以`CopyOnWriteArrayList`并不适合大数据量的场景。**
 
 **2. 数据一致性**
-**CopyOnWriteArrayList只能保证数据的最终一致性，不能保证数据的实时一致性——读操作读到的数据只是一份快照**。所以如果希望写入的数据可以立刻被读到，那CopyOnWriteArrayList并不适合。
+**`CopyOnWriteArrayList`只能保证数据的最终一致性，不能保证数据的实时一致性——读操作读到的数据只是一份快照**。所以如果希望写入的数据可以立刻被读到，那CopyOnWriteArrayList并不适合。
 
 **CopyOnWriteArraySet总结：**
 
@@ -1753,8 +1818,6 @@ public boolean add(E e) {
 3. 内存的使用较多
 4. 迭代是对快照进行的，不会抛出`ConcurrentModificationException`，且迭代过程中不支持修改操作。
 
-
-
 ## 5、ConcurrentLinkedQueue
 
 ### 5.1、简介
@@ -1764,7 +1827,7 @@ public boolean add(E e) {
 - **使用阻塞算法**：使用阻塞算法的队列可以用一个锁（入队和出队用同一把锁）或两个锁（入队和出队用不同的锁）等方式来实现。
 - **使用非阻塞算法**：非阻塞的实现方式则可以使用**循环CAS（CAS+自旋）**的方式来实现。
 
-`ConcurrentLinkedQueue`是一个**基于链接节点的无界线的程安全队列，非阻塞的**，它采用`FIFO`的规则对节点进行排序，当我们添加一个元素的时候，它会添加到队列的尾部；当我们获取一个元素时，它会返回队列头部的元素。它采用了“`wait-free`”算法（即CAS算法）来实现，该算法在`Michael&Scott`算法上进行了一些修改。
+`ConcurrentLinkedQueue`是一个**基于链接节点的无界线的线程安全队列，非阻塞的**，它采用`FIFO`的规则对节点进行排序，当我们添加一个元素的时候，它会添加到队列的尾部；当我们获取一个元素时，它会返回队列头部的元素。它采用了“`wait-free`”算法（即CAS算法）来实现，该算法在`Michael&Scott`算法上进行了一些修改。
 
 **CoucurrentLinkedQueue规定了如下几个不变性：**
 
@@ -1913,7 +1976,7 @@ public ConcurrentLinkedQueue(Collection<? extends E> c) {
 }
 ```
 
-我们重点看下空构造器，通过空构造器建立的ConcurrentLinkedQueue对象，其`head`和`tail`指针并非指向`null`，而是指向一个item值为null的`Node`结点——哨兵结点，如下图： 
+我们重点看下空构造器，通过空构造器建立的`ConcurrentLinkedQueue`对象，其`head`和`tail`指针并非指向`null`，而是指向一个item值为null的`Node`结点——哨兵结点，如下图： 
 
  ![clipboard.png](.\img\asdasd1231g321)
 
@@ -1923,12 +1986,12 @@ public ConcurrentLinkedQueue(Collection<? extends E> c) {
 
 对于修改`head`中的`netx`节点以及修改`tail`的指向都是由`CAS方法`完成。
 
- ![img](E:\软件开发资料\Java\Java资料\java高级\img\asdasd12312s) 
+ ![img](.\img\asdasd12312s) 
 
-- `添加元素1`：**这里测试发现插入第一个元素后，执行完`if (p.casNext(null, newNode))`后`head`节点的引用指向元素1，`tail`节点的指针指向不变，但成员变量next指向了自己（如图中所示，head指向了元素1，tail还是指向的初始化节点，只不过tail的next指向了自己）。**
-- `添加元素2`：队列首先执行`p = (t != (t = tail)) ? t : head;`设置`for (Node<E> t = tail, p = t;;)`中`p`变量指向`head`节点；再次循环，设置**元素1**节点的`next`节点为**元素2**节点，然后执行`casTail(t, newNode)`更新`tail`节点指向`元素2`节点。
--  `添加元素3`：设置**元素2**节点的`next`节点为**元素3**节点（这时`tail`节点的`next`也指向了**元素3**）。
--  `添加元素4`：经过判断进入`else`执行`p = (p != t && t != (t = tail)) ? t : q;`，变量`p`指向`tail`节点的`next`节点；再次循环，执行完`if (p.casNext(null, newNode))`后`head`节点的引用指向**元素4**，然后执行`casTail(t, newNode)`更新`tail`节点指向**元素4**节点。
+- **`添加元素1`**：**这里测试发现插入第一个元素后，执行完`if (p.casNext(null, newNode))`后`head`节点的引用指向元素1，`tail`节点的指针指向不变，但成员变量next指向了自己（如图中所示，head指向了元素1，tail还是指向的初始化节点，只不过tail的next指向了自己）。**
+- **`添加元素2`**：队列首先执行`p = (t != (t = tail)) ? t : head;`设置`for (Node<E> t = tail, p = t;;)`中`p`变量指向`head`节点；再次循环，设置**元素1**节点的`next`节点为**元素2**节点，然后执行`casTail(t, newNode)`更新`tail`节点指向`元素2`节点。
+-  **`添加元素3`**：设置**元素2**节点的`next`节点为**元素3**节点（这时`tail`节点的`next`也指向了**元素3**）。
+-  **`添加元素4`**：经过判断进入`else`执行`p = (p != t && t != (t = tail)) ? t : q;`，变量`p`指向`tail`节点的`next`节点；再次循环，执行完`if (p.casNext(null, newNode))`后`head`节点的引用指向**元素4**，然后执行`casTail(t, newNode)`更新`tail`节点指向**元素4**节点。
 -  **注意：**`casTail(t, newNode)`的作用就是重置tail队尾指针的指向，可以看到，`ConcurrentLinkedQueue` 其实是以每次跳2个结点的方式移动指针，这主要考虑到并发环境以这种hop跳的方式可以提升效率。 
 
 ```java
@@ -1974,9 +2037,7 @@ public boolean offer(E e) {
 
 #### 5.2.4、出队列
 
-出队列的就是从队列里返回一个节点元素，并清空该节点对元素的引用。
-
-  ![img](.\img\asd123s1s245f)
+出队列的就是从队列里返回一个节点元素，并清空该节点对元素的引用![img](.\img\asd123s1s245f)
 
 ```java
 /**
@@ -2011,14 +2072,12 @@ public E poll() {
 
 ### 5.3、总结
 
-**ConcurrentLinkedQueue**使用了**自旋+CAS**的非阻塞算法来保证线程并发访问时的数据一致性。由于队列本身是一种链表结构，所以虽然算法看起来很简单，但其实需要考虑各种并发的情况，实现复杂度较高，并且ConcurrentLinkedQueue不具备实时的数据一致性，实际运用中，队列一般在生产者-消费者的场景下使用得较多，所以ConcurrentLinkedQueue的使用场景并不如阻塞队列那么多。
+**ConcurrentLinkedQueue**使用了**自旋+CAS**的非阻塞算法来保证线程并发访问时的数据一致性。由于队列本身是一种链表结构，所以虽然算法看起来很简单，但其实需要考虑各种并发的情况，实现复杂度较高，并且`ConcurrentLinkedQueue`不具备实时的数据一致性，**实际运用中，队列一般在生产者-消费者的场景下使用得较多，所以`ConcurrentLinkedQueue`的使用场景并不如阻塞队列那么多。**
 
 另外，关于ConcurrentLinkedQueue还有以下需要注意的几点：
 
-1. ConcurrentLinkedQueue的迭代器是弱一致性的，这在并发容器中是比较普遍的现象，主要是指在一个线程在遍历队列结点而另一个线程尝试对某个队列结点进行修改的话不会抛出`ConcurrentModificationException`，这也就造成在遍历某个尚未被修改的结点时，在next方法返回时可以看到该结点的修改，但在遍历后再对该结点修改时就看不到这种变化。
+1. `ConcurrentLinkedQueue`的迭代器是弱一致性的，这在并发容器中是比较普遍的现象，主要是指在一个线程在遍历队列结点而另一个线程尝试对某个队列结点进行修改的话不会抛出`ConcurrentModificationException`，这也就造成在遍历某个尚未被修改的结点时，在next方法返回时可以看到该结点的修改，但在遍历后再对该结点修改时就看不到这种变化。
 2. `size`方法需要遍历链表，所以在并发情况下，其结果不一定是准确的，只能供参考。
-
-
 
 ## 6、ConcurrentLinkDeque
 
@@ -2036,7 +2095,7 @@ public E poll() {
 
 ### 6.1、Queue接口定义
 
-Queue的接口非常简单，一共只有三种类型的操作：入队、出队、读取。
+`Queue`的接口非常简单，一共只有三种类型的操作：入队、出队、读取。
 
 可以划分如下： 
 
@@ -2071,7 +2130,7 @@ Queue接口的所有方法Deque都具备，只不过队首/队尾都可以进行
 
 ### 6.3、ConcurrentLinkedDeque简介
 
-`ConcurrentLinkedDeque`是JDK1.7时，J.U.C包引入的一个集合工具类。**在JDK1.7之前，除了Stack类外，并没有其它适合并发环境的“栈”数据结构。ConcurrentLinkedDeque作为双端队列，可以当作“栈”来使用，并且高效地支持并发环境。** 
+`ConcurrentLinkedDeque`是JDK1.7时，J.U.C包引入的一个集合工具类。**在JDK1.7之前，除了Stack类外，并没有其它适合并发环境的“栈”数据结构。`ConcurrentLinkedDeque`作为双端队列，可以当作“栈”来使用，并且高效地支持并发环境。** 
 
 `ConcurrentLinkedDeque`和`ConcurrentLinkedQueue`一样，采用了无锁算法，底层基于**自旋+CAS**的方式实现。  ![clipboard.png](.\img\fffa123asd12s)
 
@@ -2164,14 +2223,12 @@ public ConcurrentLinkedDeque(Collection<? extends E> c) {
 
 ### 6.5、总结
 
-**ConcurrentLinkedDeque**使用了**自旋+CAS**的非阻塞算法来保证线程并发访问时的数据一致性。由于队列本身是一种双链表结构，所以虽然算法看起来很简单，但其实需要考虑各种并发的情况，实现复杂度较高，并且ConcurrentLinkedDeque不具备实时的数据一致性，实际运用中，如果需要一种线程安全的栈结构，可以使用ConcurrentLinkedDeque。 
+**ConcurrentLinkedDeque**使用了**自旋+CAS**的**非阻塞算法来保证线程并发访问时的数据一致性**。由于队列本身是一种双链表结构，所以虽然算法看起来很简单，但其实需要考虑各种并发的情况，实现复杂度较高，并且`ConcurrentLinkedDeque`不具备实时的数据一致性，实际运用中，如果需要一种线程安全的栈结构，可以使用`ConcurrentLinkedDeque`。 
 
 另外，关于ConcurrentLinkedDeque还有以下需要注意的几点：
 
 1. ConcurrentLinkedDeque的迭代器是弱一致性的，这在并发容器中是比较普遍的现象，主要是指在一个线程在遍历队列结点而另一个线程尝试对某个队列结点进行修改的话不会抛出ConcurrentModificationException，这也就造成在遍历某个尚未被修改的结点时，在next方法返回时可以看到该结点的修改，但在遍历后再对该结点修改时就看不到这种变化。
 2. size方法需要遍历链表，所以在并发情况下，其结果不一定是准确的，只能供参考。
-
-
 
 
 ## 7、BlockingQueue
@@ -2197,11 +2254,11 @@ public ConcurrentLinkedDeque(Collection<? extends E> c) {
 
 在阻塞队列不可用时，这两个附加操作提供了以下4种处理方式：
 
-| 方法/处理方式 |  抛出异常   | 返回特殊值 | 一直阻塞 |        超时退出        |
-| :-----------: | :---------: | :--------: | :------: | :--------------------: |
-|   插入方法    |  `add(e)`   | `offer(e)` | `put(e)` | `offer(e, time, unit)` |
-|   移除方法    | `remove()`  |  `poll()`  | `take()` |   `poll(time, unit)`   |
-|   检查方法    | `element()` |  `peek()`  |    /     |           /            |
+|  方法/处理方式   |  抛出异常   | 返回特殊值 | 一直阻塞 |        超时退出        |
+| :--------------: | :---------: | :--------: | :------: | :--------------------: |
+|     插入方法     |  `add(e)`   | `offer(e)` | `put(e)` | `offer(e, time, unit)` |
+|     移除方法     | `remove()`  |  `poll()`  | `take()` |   `poll(time, unit)`   |
+| 检查方法（读取） | `element()` |  `peek()`  |    /     |           /            |
 
 - **抛出异常：**队列满时，再添加元素，会抛出 `IllegalStateException("Queue full")`异常 ，当队列为空时，从队列里获取元素会抛出 `NoSuchElementException`异常。 
 - **返回特殊值：**往队列里插入元素时，返回`true`表示插入成功。从队列里移除元素，即取出元素，如果没有则返回`null`。
@@ -2244,8 +2301,6 @@ public interface BlockingQueue<E> extends Queue<E> {
 - **BlockingQueue队列中不能包含null元素；**
 - BlockingQueue接口的实现类都必须是线程安全的，实现类一般通过“锁”保证线程安全；
 - BlockingQueue 可以是限定容量的。`#remainingCapacity()`方法用于返回剩余可用容量，对于没有容量限制的BlockingQueue实现，该方法总是返回`Integer.MAX_VALUE` 。
-
-
 
 ## 8、ArrayBlockingQueue
 
@@ -2318,12 +2373,12 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
     final ReentrantLock lock;
 
     /**
-     * 非空条件队列：当队列空时，线程在该队列等待获取
+     * 非空条件队列：当队列空时，出队操作线程在该队列等待获取
      */
     private final Condition notEmpty;
 
     /**
-     * 非满条件队列：当队列满时，线程在该队列等待插入
+     * 非满条件队列：当队列满时，入队操作线程在该队列等待插入
      */
     private final Condition notFull;
 
@@ -2413,7 +2468,7 @@ private void enqueue(E x) {
 }
 ```
 
-该方法就是在 `putIndex`（对尾）位置处，添加元素，最后调用 `notEmpty` 的 `#signal()` 方法，**通知阻塞在出列的线程**（如果队列为空，则进行出列操作是会阻塞）。
+该方法就是在 `putIndex`（队尾）位置处，添加元素，最后调用 `notEmpty` 的 `#signal()` 方法，**通知阻塞在出列的线程**（如果队列为空，则进行出列操作是会阻塞）。
 
 #### 8.3.4、可超时的offer
 
@@ -2699,7 +2754,7 @@ public E poll(long timeout, TimeUnit unit) throws InterruptedException {
 
 **④插入元素“90”**
 
-注意，此时再插入一个元素“90”，则putIndex变成6，等于队列容量6，由于是循环队列，所以会将tableIndex重置为0：
+注意，此时再插入一个元素“90”，则putIndex变成6，等于队列容量6，由于是循环队列，所以会将`tableIndex`重置为0：
 
 ![clipboard.png](.\img\asfjaoisjfoi1)
 
@@ -2719,7 +2774,7 @@ public E poll(long timeout, TimeUnit unit) throws InterruptedException {
 
 **③出队元素“90”**
 
-注意，此时再出队一个元素“90”，则tabeIndex变成6，等于队列容量6，由于是循环队列，所以会将tableIndex重置为0：
+注意，此时再出队一个元素“90”，则`tabeIndex`变成6，等于队列容量6，由于是循环队列，所以会将`tableIndex`重置为0：
 
 ![clipboard.png](.\img\aoihfgoiasfodias)
 
@@ -2764,7 +2819,7 @@ public ArrayBlockingQueue(int capacity, boolean fair,
 
 `ArrayBlockingQueue`利用了`ReentrantLock`来保证线程的安全性，针对队列的修改都需要加全局锁。在一般的应用场景下已经足够。对于超高并发的环境，**由于生产者-消息者共用一把锁，可能出现性能瓶颈**。
 
-另外，由于`ArrayBlockingQueue`是有界的，且在初始时指定队列大小，所以如果初始时需要限定消息队列的大小，则`ArrayBlockingQueue` 比较合适。后续，我们会介绍另一种基于单链表实现的阻塞队列——**LinkedBlockingQueue**，该队列的最大特点是使用了“两把锁”，以提升吞吐量。
+另外，由于`ArrayBlockingQueue`是有界的，且在初始时指定队列大小，所以如果初始时需要限定消息队列的大小，则`ArrayBlockingQueue` 比较合适。后续，我们会介绍另一种基于单链表实现的阻塞队列——**`LinkedBlockingQueue`**，该队列的最大特点是使用了“两把锁”，以提升吞吐量。
 
 
 
@@ -2911,7 +2966,7 @@ public void put(E e) throws InterruptedException {
     Node<E> node = new Node(e);
     final ReentrantLock putLock = this.putLock;
     final AtomicInteger count = this.count;
-    //加锁，保证数据的一致性：
+    //加锁，保证数据的一致性；(可中断的锁)
     putLock.lockInterruptibly();
     try {
         //当队列元素个数==链表长度
@@ -2921,7 +2976,7 @@ public void put(E e) throws InterruptedException {
         }
         //插入元素：
         enqueue(node);
-        //队列元素增加：count+1,但返回+1前的count值：
+        //队列元素增加：count+1,但返回+1前的count值；
         c = count.getAndIncrement();
         // 容量还没满，唤醒生产者线程
         // (例如链表长度为5，此时第五个元素已经插入，c=4，+1=5，所以超过了队列容量，则不会再唤醒生产者线程)
@@ -3218,8 +3273,6 @@ public class LinkedBlockingQueueTest {
 }
 ```
 
-
-
 ## 10、PriorityBlockingQueue
 
 ### 10.1、简介
@@ -3231,8 +3284,8 @@ public class LinkedBlockingQueueTest {
 `PriorityBlockingQueue`是一种**无界阻塞队列**，在构造的时候可以指定队列的初始容量。具有如下特点：
 
 1. `PriorityBlockingQueue`与之前介绍的阻塞队列最大的不同之处就是：它是一种**优先级队列**，也就是说元**素并不是以`FIFO`的方式出/入队，而是以按照权重大小的顺序出队；**
-2. `PriorityBlockingQueue`是近似无界队列，它不像`ArrayBlockingQueue`那样构造时必须指定最大容量，也不像`LinkedBlockingQueue`默认最大容量为`Integer.MAX_VALUE`，而是**在初始化时可以不设置容量，而是在自动扩容期间，限制最大容量为`Integer.MAX_VALUE - 8`；**
-3. 由于`PriorityBlockingQueue`是按照元素的权重进入排序，所以队列中的元素必须是可以比较的，也就是说元素必须实现`Comparable`接口；
+2. `PriorityBlockingQueue`是近似无界队列，它不像`ArrayBlockingQueue`那样构造时必须指定最大容量，也不像`LinkedBlockingQueue`默认最大容量为`Integer.MAX_VALUE`，**在初始化时可以不设置容量，而是在自动扩容期间，限制最大容量为`Integer.MAX_VALUE - 8`；**
+3. 由于`PriorityBlockingQueue`是按照元素的权重进行排序，所以队列中的元素必须是可以比较的，也就是说元素必须实现`Comparable`接口；
 4. 由于`PriorityBlockingQueue`无界队列，所以插入元素永远不会阻塞线程；
 5. `PriorityBlockingQueue`底层是一种**基于数组实现的堆结构**。
 6. 不能存储`Null`值。
@@ -3243,7 +3296,7 @@ public class LinkedBlockingQueueTest {
 
 ### 10.2、二叉树
 
-二叉堆是一种特殊的堆，就结构性而言就是完全二叉树或者是近似完全二叉树，满足树结构性和堆序性。树机构特性就是完全二叉树应该有的结构，堆序性则是：**父节点的键值总是保持固定的序关系于任何一个子节点的键值，且每个节点的左子树和右子树都是一个二叉堆**。它有两种表现形式：最大堆、最小堆。
+二叉堆是一种特殊的堆，就结构性而言就是完全二叉树或者是近似完全二叉树，满足树结构性和堆序性。树机构特性就是完全二叉树应该有的结构，堆序性则是：**父节点的键值总是保持固定的顺序关系于任何一个子节点的键值，且每个节点的左子树和右子树都是一个二叉堆**。它有两种表现形式：最大堆、最小堆。
 
 最大堆：**父节点的键值总是大于或等于任何一个子节点的键值**（下右图）
 
@@ -3251,7 +3304,7 @@ public class LinkedBlockingQueueTest {
 
 ![201703270001](.\img\2018120827001.png)
 
-二叉堆一般用数组表示，如果父节点的节点位置在`n`处，那么其左孩子节点为：`2 * n + 1` ，其右孩子节点为`2 * (n + 1)`，其父节点为`（n - 1） / 2` 处。上左图的数组表现形式为：
+二叉堆一般用数组表示，如果父节点的节点位置在`n`处，那么其左子节点为：`2 * n + 1` ，其右子节点为`2 * (n + 1)`，其父节点为`（n - 1） / 2` 处。上左图的数组表现形式为：
 
 ![201703270002_2](.\img\2018120827002.png)
 
@@ -3259,7 +3312,7 @@ public class LinkedBlockingQueueTest {
 
 #### 添加元素
 
-首先将要添加的元素N插添加到堆的末尾位置（在二叉堆中我们称之为空穴）。如果元素N放入空穴中而不破坏堆的序（其值大于跟父节点值（最大堆是小于父节点）），那么插入完成。否则，我们则将该元素N的节点与其父节点进行交换，然后与其新父节点进行比较直到它的父节点不在比它小（最大堆是大）或者到达根节点。
+首先将要添加的元素N插添加到堆的末尾位置（在二叉堆中我们称之为空穴）。如果元素N放入空穴中而不破坏堆的顺序（其值大于根父节点值（最大堆是小于父节点）），那么插入完成。否则，我们则将该元素N的节点与其父节点进行交换，然后与其新父节点进行比较直到它的父节点不在比它小（最大堆是大）或者到达根节点。
 
 假如有如下一个二叉堆
 
@@ -3282,7 +3335,7 @@ public class LinkedBlockingQueueTest {
 
 #### 删除元素
 
-删除元素与增加元素一样，需要维护整个二叉堆的序。删除位置1的元素（数组下标0），则把最后一个元素空出来移到最前边，然后和它的两个子节点比较，如果两个子节点中较小的节点小于该节点，就将他们交换，知道两个子节点都比该元素大为止。
+删除元素与增加元素一样，需要维护整个二叉堆的序。删除位置1的元素（数组下标0），则把最后一个元素空出来移到最前边，然后和它的两个子节点比较，如果两个子节点中较小的节点小于该节点，就将他们交换，直到两个子节点都比该元素大为止。
 
 就上面二叉堆而言，删除的元素为元素1。
 
@@ -3737,17 +3790,15 @@ private static <T> void siftDownComparable(int k, T x, Object[] array, int n) {
 
 ### 10.6、总结
 
-**PriorityBlockingQueue**属于比较特殊的阻塞队列，适用于有元素优先级要求的场景。它的内部和`ArrayBlockingQueue`一样，使用一个了全局独占锁来控制同时只有一个线程可以进行入队和出队，另外由于该队列是无界队列，所以入队线程并不会阻塞。
+**`PriorityBlockingQueue`**属于比较特殊的阻塞队列，适用于有元素优先级要求的场景。它的内部和`ArrayBlockingQueue`一样，使用一个了全局独占锁来控制同时只有一个线程可以进行入队和出队，另外由于该队列是无界队列，所以入队线程并不会阻塞。
 
 `PriorityBlockingQueue`始终保证出队的元素是优先级最高的元素，并且可以定制优先级的规则，内部通过使用**堆（数组形式）**来维护元素顺序，它的内部数组是可扩容的，扩容和出/入队可以并发进行。
-
-
 
 ## 11、DelayQueue
 
 ### 11.1、简介
 
-`DelayQueue`是JDK1.5时，随着J.U.C包一起引入的一种阻塞队列，它实现了BlockingQueue接口，底层基于已有的**PriorityBlockingQueue**实现：
+`DelayQueue`是JDK1.5时，随着J.U.C包一起引入的一种阻塞队列，它实现了`BlockingQueue`接口，底层基于已有的**PriorityBlockingQueue**实现：
 
 ![clipboard.png](.\img\asdasooi12j3io)
 
@@ -3803,8 +3854,6 @@ https://segmentfault.com/a/1190000016388106#item-4
 
 http://www.iocoder.cn/JUC/sike/DelayQueue/
 
-
-
 ## 12、SynchronousQueue
 
 ### 12.1、简介
@@ -3830,8 +3879,6 @@ https://segmentfault.com/a/1190000016359551#item-2-6
 
 http://www.iocoder.cn/JUC/sike/SynchronousQueue/
 
-
-
 ## 13、LinkedBlockingDeque
 
 ### 13.1、简介
@@ -3840,13 +3887,13 @@ http://www.iocoder.cn/JUC/sike/SynchronousQueue/
 
 ![clipboard.png](.\img\f2392hjf21)
 
-> **注意：**LinkedBlockingDeque底层利用ReentrantLock实现同步，并不像ConcurrentLinkedDeque那样采用无锁算法（CAS+自旋）。
+> **注意：**`LinkedBlockingDeque`底层利用`ReentrantLock`实现同步，并不像ConcurrentLinkedDeque那样采用无锁算法（CAS+自旋）。
 
-另外，LinkedBlockingDeque是一种**近似有界阻塞队列**，为什么说近似？因为LinkedBlockingDeque既可以在初始构造时就指定队列的容量，也可以不指定，如果不指定，那么它的容量大小默认为`Integer.MAX_VALUE`。
+另外，`LinkedBlockingDeque`是一种**近似有界阻塞队列**，为什么说近似？因为`LinkedBlockingDeque`既可以在初始构造时就指定队列的容量，也可以不指定，如果不指定，那么它的容量大小默认为`Integer.MAX_VALUE`。
 
 #### BlockingDeque接口
 
-目前阻塞队列都是实现了[BlockingQueue](https://segmentfault.com/a/1190000016296278)接口。和普通双端队列接口——[Deque](https://segmentfault.com/a/1190000016284649)一样，J.U.C中也有一种阻塞的双端队列接口——`BlockingDeque`。BlockingDeque是JDK1.6时，J.U.C包新增的一个接口：
+目前阻塞队列都是实现了[BlockingQueue](https://segmentfault.com/a/1190000016296278)接口。和普通双端队列接口——[Deque](https://segmentfault.com/a/1190000016284649)一样，J.U.C中也有一种阻塞的双端队列接口——`BlockingDeque`。`BlockingDeque`是JDK1.6时，J.U.C包新增的一个接口：
 ![clipboard.png](.\img\5656sds6512gt)
 
 ***BlockingDeque的类继承关系图：\***
@@ -3936,7 +3983,7 @@ static final class Node<E> {
 }
 ```
 
-字段`first`指向队首结点，字段last指向队尾结点。另外LinkedBlockingDeque利用**ReentrantLock**来保证线程安全，所有对队列的修改操作都需要先获取这把全局锁：
+字段`first`指向队首结点，字段last指向队尾结点。另外`LinkedBlockingDeque`利用**ReentrantLock**来保证线程安全，所有对队列的修改操作都需要先获取这把全局锁：
 
 ```java
 public class LinkedBlockingDeque<E> extends AbstractQueue<E>
@@ -4230,14 +4277,12 @@ private E unlinkLast() {
 
 ### 13.5、总结
 
-LinkedBlockingDeque作为一种阻塞双端队列，**提供了队尾删除元素和队首插入元素的阻塞方法。该类在构造时一般需要指定容量，如果不指定，则最大容量为`Integer.MAX_VALUE`**。另外，由于内部通过ReentrantLock来保证线程安全，所以LinkedBlockingDeque的整体实现时比较简单的。
+LinkedBlockingDeque作为一种阻塞双端队列，**提供了队尾删除元素和队首插入元素的阻塞方法。该类在构造时一般需要指定容量，如果不指定，则最大容量为`Integer.MAX_VALUE`**。另外，由于内部通过`ReentrantLock`来保证线程安全，所以`LinkedBlockingDeque`的整体实现时比较简单的。
 
 另外，双端队列相比普通队列，**主要是多了【队尾出队元素】/【队首入队元素】的功能**。
 阻塞队列我们知道一般用于“生产者-消费者”模式，而双端阻塞队列在“生产者-消费者”就可以利用“双端”的特性，从队尾出队元素。
 
 考虑下面这样一种场景：有多个消费者，每个消费者有自己的一个消息队列，生产者不断的生产数据扔到队列中，消费者消费数据有快又慢。为了提升效率，速度快的消费者可以从其它消费者队列的**队尾**出队元素放到自己的消息队列中，由于是从其它队列的队尾出队，这样可以减少并发冲突（其它消费者从队首出队元素），又能提升整个系统的吞吐量。这其实是一种“**工作窃取算法**”的思路。
-
-
 
 ## 14、LinkedTransferQueue
 
@@ -4302,7 +4347,7 @@ LinkedBlockingDeque作为一种阻塞双端队列，**提供了队尾删除元�
 AtomicInteger提供了两个构造器，使用默认构造器时，内部int类型的value值为0：
 `AtomicInteger atomicInt = new AtomicInteger();`
 
-AtomicInteger类的内部并不复杂，所有的操作都针对内部的int值——value，并通过`Unsafe`类来实现线程安全的`CAS`操作：
+`AtomicInteger`类的内部并不复杂，所有的操作都针对内部的int值——value，并通过`Unsafe`类来实现线程安全的`CAS`操作：
 ![clipboard.png](.\img\s56df45s6d4f)
 
 #### 2.1.2、AtomicInteger的使用
@@ -4374,7 +4419,7 @@ AtomicInteger中有一个比较特殊的方法——**lazySet**：
 
 1. **保证写volatile变量会强制把CPU写缓存区的数据刷新到内存**
 2. **读volatile变量时，使缓存失效，强制从内存中读取最新的值**
-3. **由于内存屏障的存在，volatile变量还能阻止重排序**
+3. **由于内存屏障的存在，volatile变量还能阻止重排序(指定重排)**
 
 **lazySet**内部调用了Unsafe类的**putOrderedInt**方法，通过该方法对共享变量值的改变，不一定能被其他线程立即看到。也就是说以普通变量的操作方式来写变量。
 
@@ -4505,8 +4550,6 @@ public final native boolean compareAndSwapLong(Object o, long offset,
 
 以上3个类提供的方法几乎一模一样，仅以 `AtomicInteger` 为例进行讲解。
 
-
-
 ## 3、原子更新引用
 
 ### 3.1、简介
@@ -4607,11 +4650,11 @@ Object newCache  =  someFunctionOfOld(oldCache);
 boolean success = ref.compareAndSet(oldCache , newCache);
 ```
 
-上面的代码模板就是AtomicReference的常见使用方式，看下**compareAndSet**方法：
+上面的代码模板就是`AtomicReference`的常见使用方式，看下**compareAndSet**方法：
 
 ![clipboard.png](.\img\4564fsd89f4s89sd2)
 
-该方法会将入参的**expect**变量所指向的对象和AtomicReference中的引用对象进行比较，如果两者指向同一个对象，则将AtomicReference中的引用对象重新置为**update**，修改成功返回true，失败则返回false。也就是说，***AtomicReference其实是比较对象的引用***。
+该方法会将入参的**expect**变量所指向的对象和AtomicReference中的引用对象进行比较，如果两者指向同一个对象，则将AtomicReference中的引用对象重新置为**update**，修改成功返回true，失败则返回false。也就是说，***`AtomicReference`其实是比较对象的引用***。
 
 #### 3.2.2、接口声明
 
@@ -4650,7 +4693,7 @@ boolean success = ref.compareAndSet(oldCache , newCache);
 
 ![clipboard.png](.\img\5as4f68sd4fd)
 
-可以看到，除了传入一个初始的引用变量**`initialRef`**外，还有一个**initialStamp**变量，**initialStamp**其实就是版本号（或者说时间戳），用来唯一标识引用变量。
+可以看到，除了传入一个初始的引用变量**`initialRef`**外，还有一个**`initialStamp`**变量，**`initialStamp`**其实就是版本号（或者说时间戳），用来唯一标识引用变量。
 
 在构造器内部，实例化了一个**Pair**对象，**Pair**对象记录了对象引用和时间戳信息，采用int作为时间戳，实际使用的时候，要保证时间戳唯一（一般做成自增的），如果时间戳如果重复，还会出现**ABA**的问题。
 
@@ -4675,7 +4718,7 @@ asr.compareAndSet(oldRef, null, oldStamp, oldStamp + 1)   //尝试以CAS方式�
 
 我们知道，`AtomicStampedReference`内部保存了一个`pair`对象，该方法的逻辑如下：
 
-1. 如果AtomicStampedReference内部pair的引用变量、时间戳 与 入参**expectedReference**、**expectedStamp**都一样，说明期间没有其它线程修改过AtomicStampedReference，可以进行修改。此时，会创建一个新的Pair对象（casPair方法，因为Pair是Immutable类）。
+1. 如果`AtomicStampedReference`内部pair的引用变量、时间戳与入参**`expectedReference`**、**`expectedStamp`**都一样，说明期间没有其它线程修改过`AtomicStampedReference`，可以进行修改。此时，会创建一个新的Pair对象（casPair方法，因为Pair是Immutable类）。
 
 但这里有段优化逻辑，就是如果 `newReference == current.reference && newStamp == current.stamp`，说明用户修改的新值和`AtomicStampedReference`中目前持有的值完全一致，那么其实不需要修改，直接返回true即可。
 
@@ -4695,12 +4738,12 @@ asr.compareAndSet(oldRef, null, oldStamp, oldStamp + 1)   //尝试以CAS方式�
 
 ### 3.5、AtomicMarkableReference
 
-我们在讲**ABA**问题的时候，引入了AtomicStampedReference。
+我们在讲**ABA**问题的时候，引入了`AtomicStampedReference`。
 
-AtomicStampedReference可以给引用加上版本号，追踪引用的整个变化过程，如：
-A -> B -> C -> D - > A，通过AtomicStampedReference，我们可以知道，引用变量中途被更改了3次。
+`AtomicStampedReference`可以给引用加上版本号，追踪引用的整个变化过程，如：
+A -> B -> C -> D - > A，通过`AtomicStampedReference`，我们可以知道，引用变量中途被更改了3次。
 
-但是，有时候，我们并不关心引用变量更改了几次，只是单纯的关心**是否更改过**，所以就有了**AtomicMarkableReference**：
+但是，有时候，我们并不关心引用变量更改了几次，只是单纯的关心**是否更改过**，所以就有了**`AtomicMarkableReference`**：
 
 ![clipboard.png](.\img\asd4f68sd47f89sd89f)
 
@@ -4722,17 +4765,15 @@ A -> B -> C -> D - > A，通过AtomicStampedReference，我们可以知道，引
 | `void`       | `set(V newReference,  boolean newMark)`  无条件地设置引用和标记的值。 |
 | `boolean`    | `weakCompareAndSet(V expectedReference,  V newReference,  boolean expectedMark, boolean newMark)`  以原子方式设置该引用和标记给定的更新值的值，如果当前的参考是  `==`至预期的参考和当前标记等于预期标记。 |
 
-
-
 ## 4、原子更新数组
 
 ### 4.1、Atomic数组简介
 
-Atomic数组，顾名思义，就是能以原子的方式，操作数组中的元素。
+`Atomic`数组，顾名思义，就是能以原子的方式，操作数组中的元素。
 
 JDK提供了三种类型的原子数组：`AtomicIntegerArray`、`AtomicLongArray`、`AtomicReferenceArray`。
 
-这三种类型大同小异，AtomicIntegerArray对应AtomicInteger，AtomicLongArray对应AtomicLong，AtomicReferenceArray对应AtomicReference。
+这三种类型大同小异，`AtomicIntegerArray`对应`AtomicInteger`，`AtomicLongArray`对应`AtomicLong`，`AtomicReferenceArray`对应`AtomicReference`。
 
 其实阅读源码也可以发现，**这些数组原子类与对应的普通原子类相比，只是多了通过索引找到内存中元素地址的操作而已。**
 
@@ -4790,8 +4831,6 @@ ai.get(1) = 5
 ```
 
 > 需要注意的是，数组`value`通过构造方法传递进去，然后`AtomicIntegerArray`会将当前数组复制一份，所以当`AtomicIntegerArray`对内部的数组元素进行 **修改** 时，**不会影响传入的数组**。
-
-
 
 ## 5、原子更新字段
 
@@ -4983,10 +5022,10 @@ newUpdater的三个入参含义如下：
 
 **AtomicReferenceFieldUpdaterImpl**是`AtomicReferenceFieldUpdater`的一个内部类，并继承了`AtomicReferenceFieldUpdater`。`AtomicReferenceFieldUpdater`的API，基本都是委托`AtomicReferenceFieldUpdaterImpl` 来实现的。
 
-来看下**AtomicReferenceFieldUpdaterImpl** 对象的构造，其实就是一系列的权限检查：
+来看下**`AtomicReferenceFieldUpdaterImpl`** 对象的构造，其实就是一系列的权限检查：
 <img src=".\img\fiaosjfi2190ufzsakfa" alt="clipboard.png" style="zoom:150%;" />
 
-通过源码，可以看到**AtomicReferenceFieldUpdater**的使用必须满足以下条件：
+通过源码，可以看到**`AtomicReferenceFieldUpdater`**的使用必须满足以下条件：
 
 1. `AtomicReferenceFieldUpdater`只能修改对于它可见的字段，也就是说对于目标类的某个字段field，如果修饰符是`private`，但是`AtomicReferenceFieldUpdater`所在的使用类不能看到field，那就会报错；
 2. 目标类的操作字段，必须用`volatile`修饰；
@@ -5015,14 +5054,72 @@ newUpdater的三个入参含义如下：
 | `int`                               | `updateAndGet(T obj,  IntUnaryOperator updateFunction)`  原子更新由此更新程序管理的给定对象的字段与应用给定函数的结果，返回更新的值。 |
 | `abstract boolean`                  | `weakCompareAndSet(T obj,  int expect, int update)`  如果当前值 `==`为预期值，则将由此更新程序管理的给定对象的字段原子设置为给定的更新值。 |
 
+### 5.3、示例
 
+```java
+public class AtomicIntegerFieldUpdaterTest {
+    public static void main(String[] args) throws InterruptedException {
+        ArrayList<Thread> threads = new ArrayList<>();
+
+        User jjcc = new User("jjcc", 0);
+        AtomicIntegerFieldUpdater<User> age = AtomicIntegerFieldUpdater.newUpdater(User.class, "age");
+
+        for (int i = 0; i < 100; i++) {
+            Thread thread = new Thread(() -> {
+                for (int i1 = 0; i1 < 100; i1++) {
+                    age.incrementAndGet(jjcc);
+                }
+            });
+
+            threads.add(thread);
+
+            thread.start();
+        }
+
+
+        for (Thread thread : threads) {
+            thread.join();
+        }
+
+        System.out.println(jjcc.getAge());
+
+    }
+}
+
+class User {
+
+    public volatile int age;
+    private String name;
+
+    User(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+```
 
 ## 6、LongAdder
 
 ### 6.1、简介
 
 JDK1.8时，`java.util.concurrent.atomic`包中提供了一个新的原子类：`LongAdder`。
-根据Oracle官方文档的介绍，LongAdder在高并发的场景下会比它的前辈————AtomicLong 具有更好的性能，代价是消耗更多的内存空间：
+根据Oracle官方文档的介绍，LongAdder在高并发的场景下会比它的前辈————`AtomicLong` 具有更好的性能，代价是消耗更多的内存空间：
 
 那么，问题来了：
 
@@ -5036,9 +5133,9 @@ JDK1.8时，`java.util.concurrent.atomic`包中提供了一个新的原子类：
 
 上述方法调用了**Unsafe**类的**getAndAddLong**方法，该方法是个**native**方法，它的逻辑是采用自旋的方式不断更新目标值，直到更新成功。
 
-在并发量较低的环境下，线程冲突的概率比较小，自旋的次数不会很多。但是，高并发环境下，N个线程同时进行自旋操作，会出现大量失败并不断自旋的情况，此时**AtomicLong**的自旋会成为瓶颈。
+在并发量较低的环境下，线程冲突的概率比较小，自旋的次数不会很多。但是，高并发环境下，N个线程同时进行自旋操作，会出现大量失败并不断自旋的情况，此时**`AtomicLong`**的自旋会成为瓶颈。
 
-这就是**LongAdder**引入的初衷——解决高并发环境下**AtomicLong**的自旋瓶颈问题。
+这就是**`LongAdder`**引入的初衷——解决高并发环境下**`AtomicLong`**的自旋瓶颈问题。
 
 ### LongAdder快在哪里？
 
@@ -5046,7 +5143,7 @@ JDK1.8时，`java.util.concurrent.atomic`包中提供了一个新的原子类：
 
 我们知道，**AtomicLong**中有个内部变量**value**保存着实际的long值，所有的操作都是针对该变量进行。也就是说，高并发环境下，value变量其实是一个热点，也就是N个线程竞争一个热点。
 
-**LongAdder**的基本思路就是***分散热点\***，将value值分散到一个数组中，不同线程会命中到数组的不同槽中，各个线程只对自己槽中的那个值进行CAS操作，这样热点就被分散了，冲突的概率就小很多。如果要获取真正的long值，只要将各个槽中的变量值累加返回。
+**LongAdder**的基本思路就是***分散热点\***，**将value值分散到一个数组中，不同线程会命中到数组的不同槽中，各个线程只对自己槽中的那个值进行CAS操作，这样热点就被分散了，冲突的概率就小很多。如果要获取真正的long值，只要将各个槽中的变量值累加返回。**
 
 这种做法有没有似曾相识的感觉？没错，[ConcurrentHashMap](https://segmentfault.com/a/1190000015865714#)中的“分段锁”(`JDK1.7`)其实就是类似的思路。
 
@@ -5207,7 +5304,7 @@ class Worker implements Runnable {
 
 #### 1.2.2、作为一个完成信号
 
-将初始计数值为N的 CountDownLatch作为一个完成信号点：使某个线程在其它N个线程完成某项操作之前一直等待。
+将初始计数值为N的 `CountDownLatch`作为一个完成信号点：使某个线程在其它N个线程完成某项操作之前一直等待。
 
 ```java
 /**
@@ -5305,13 +5402,11 @@ class EmpleoyeeThread implements Runnable {
 
 `CountDownLatch` **内部通过共享锁实现**。
 
-- 在创建 CountDownLatch 实例时，需要传递一个int型的参数：`count`，该参数为计数器的初始值，也可以理解为该共享锁可以获取的总次数。
+- 在创建 `CountDownLatch` 实例时，需要传递一个int型的参数：`count`，该参数为计数器的初始值，也可以理解为该共享锁可以获取的总次数。
 - 当某个线程调用 `#await()` 方法，程序首先判断 `count` 的值是否为 0 ，如果不为 0 的话，则会一直等待直到为 0 为止。
 - 当其他线程调用 `#countDown()` 方法时，则执行释放共享锁状态，使 `count` 值 - 1。
-- 当在创建 CountDownLatch 时初始化的 `count` 参数，必须要有 `count` 线程调用`#countDown()` 方法，才会使计数器 `count` 等于 0 ，锁才会释放，前面等待的线程才会继续运行。
-- 注意 CountDownLatch **不能回滚重置**。
-
-
+- 当在创建 `CountDownLatch` 时初始化的 `count` 参数，必须要有 `count` 线程调用`#countDown()` 方法，才会使计数器 `count` 等于 0 ，锁才会释放，前面等待的线程才会继续运行。
+- 注意 `CountDownLatch` **不能回滚重置**。
 
 ## 2、同步屏障CyclicBarrier
 
@@ -5323,7 +5418,7 @@ class EmpleoyeeThread implements Runnable {
 
 `CyclicBarrier`可以认为是一个栅栏，栅栏的作用是什么？就是阻挡前行。
 
-顾名思义，CyclicBarrier是一个可以循环使用的栅栏，它做的事情就是：
+顾名思义，`CyclicBarrier`是一个可以循环使用的栅栏，它做的事情就是：
 **让线程到达栅栏时被阻塞(调用await方法)，直到到达栅栏的线程数满足指定数量要求时，栅栏才会打开放行。**
 
 > 这其实有点像军训报数，报数总人数满足教官认为的总数时，教官才会安排后面的训练。
@@ -5373,8 +5468,8 @@ public CyclicBarrier(int parties) {
 | count          | 剩余未到达的线程总数         |
 | barrierCommand | 最后一个线程到达后执行的任务 |
 
-- `CyclicBarrier(int parties)`：创建一个新的 `CyclicBarrier`，它将在给定数量的参与者（线程）处于等待状态时启动，但它不会在启动 barrier 时执行预定义的操作。
-- `CyclicBarrier(int parties, Runnable barrierAction)` ：创建一个新的 `CyclicBarrier`，它将在给定数量的参与者（线程）处于等待状态时启动，并在启动 barrier 时执行给定的屏障操作，该操作由最后一个进入 `barrier` 的线程执行。
+- `CyclicBarrier(int parties)`：创建一个新的 `CyclicBarrier`，它将在给定数量的参与者（线程）处于等待状态时启动，但它不会在启动 `barrier` 时执行预定义的操作。
+- `CyclicBarrier(int parties, Runnable barrierAction)` ：创建一个新的 `CyclicBarrier`，它将在给定数量的参与者（线程）处于等待状态时启动，并在启动 `barrier` 时执行给定的屏障操作，该操作由最后一个进入 `barrier` 的线程执行。
 
 #### 2.2.2、CyclicBarrier的内部结构
 
@@ -5382,7 +5477,7 @@ public CyclicBarrier(int parties) {
 
 ![CyclicBarrier 结构图](.\img\2018120817001.png)
 
-通过上图，我们可以看到 CyclicBarrier 的内部是使用重入锁 `ReentrantLock` 和 `Condition` 。
+通过上图，我们可以看到 `CyclicBarrier` 的内部是使用重入锁 `ReentrantLock` 和 `Condition` 。
 
 ```java
 public class CyclicBarrier {
@@ -5583,7 +5678,7 @@ private void breakBarrier() {
 
 ##### Generation
 
-Generation 是 CyclicBarrier 内部静态类，描述了 CyclicBarrier 的更新换代。**在CyclicBarrier中，同一批线程属于同一代**。当有 `parties` 个线程全部到达 barrier 时，`generation` 就会被更新换代。其中 `broken` 属性，标识该当前 CyclicBarrier 是否已经处于中断状态。代码如下：
+`Generation` 是 `CyclicBarrier` 内部静态类，描述了 CyclicBarrier 的更新换代。**在CyclicBarrier中，同一批线程属于同一代**。当有 `parties` 个线程全部到达 `barrier` 时，`generation` 就会被更新换代。其中 `broken` 属性，标识该当前 CyclicBarrier 是否已经处于中断状态。代码如下：
 
 ```java
 private static class Generation {
@@ -5610,11 +5705,11 @@ private void breakBarrier() {
 
 ##### nextGeneration
 
-当所有线程都已经到达 barrier 处（`index == 0`），则会通过 `nextGeneration()` 方法，进行更新换代操作。在这个步骤中，做了三件事：
+当所有线程都已经到达 `barrier` 处（`index == 0`），则会通过 `nextGeneration()` 方法，进行更新换代操作。在这个步骤中，做了三件事：
 
 1. 唤醒所有线程。
-2. 重置 `count` 。
-3. 重置 `generation` 。
+2. 重置 `count`(线程未到达数`count`重置为线程参与数`parties`) 。
+3. 重置 `generation`(成员变量`generation`指向新建的`Generation`对象--`broken=false`) 。
 
 代码如下：
 
@@ -5647,7 +5742,7 @@ public void reset() {
 
 ##### getNumberWaiting
 
-`#getNumberWaiting()` 方法，获得等待的线程数。代码如下：
+`#getNumberWaiting()`方法，获得等待的线程数。代码如下：
 
 ```java
 public int getNumberWaiting() {
@@ -5903,7 +5998,7 @@ Barrier是否损坏：true
 然后线程3到达，由于之前设置了中断标志位，所以线程3抛出中断异常，导致Barrier损坏，此时所有已经在栅栏等待的线程（0、1、2）都会抛出**BrokenBarrierException**异常。
 此时，即使再有其它线程到达栅栏（线程4），都会抛出**BrokenBarrierException**异常。
 
-> **注意：**使用`CyclicBarrier`时，对异常的处理一定要小心，比如线程在到达栅栏前就抛出异常，此时如果没有重试机制，其它已经到达栅栏的线程会一直等待（因为还没有满足总数），最终导致程序无法继续向下执行。
+> **注意：**使用`CyclicBarrier`时，对异常的处理一定要小心，比如**线程在到达栅栏前就抛出异常，此时如果没有重试机制，其它已经到达栅栏的线程会一直等待（因为还没有满足总数），最终导致程序无法继续向下执行。**
 
 ## 3、CyclicBarrier和CountDownLatch的区别
 
@@ -5913,27 +6008,25 @@ Barrier是否损坏：true
 
 `CyclicBarrier`还提供其他有用的方法，比如：
 
-- `getNumberWaiting`方法可以获得`CyclicBarrier`阻塞的线程数量。
+- `getNumberWaiting`方法可以获得`CyclicBarrier`阻塞的线程数量（到达栅栏的线程数量）。
 - `isBroken()`方法用来了解阻塞的线程是否被中断。
-
-
 
 ## 4、控制并发线程数的SemaPhore
 
 ### 4.1、简介
 
-`Semaphore`，又名信号量，这个类的作用有点类似于“许可证”。有时，我们**因为一些原因需要控制同时访问共享资源的最大线程数量，比如出于系统性能的考虑需要限流，或者共享资源是稀缺资源，我们需要有一种办法能够协调各个线程，以保证合理的使用公共资源**，和 `CountDownLatch` 一样，其本质上是一个“**共享锁**”。
+`Semaphore`，又名信号量，这个类的作用有点类似于“许可证”。有时，我们**因为一些原因需要控制同时访问共享资源的最大线程数量，比如出于系统性能的考虑需要限流，或者共享资源是稀缺资源，我们需要有一种办法能够协调各个线程，以保证合理的使用公共资源**，和 `CountDownLatch` 一样，其本质上是一个“**共享锁**”。      
 
 `Semaphore`维护了一个许可集，其实就是一定数量的“许可证”。
-**当有线程想要访问共享资源时，需要先获取(`acquire`)的许可；如果许可不够了，线程需要一直等待，直到许可可用。当线程使用完共享资源后，可以归还(`release`)许可，以供其它需要的线程使用**。但是，不使用实际的许可对象，`Semaphore` 只对可用许可的号码进行计数，并采取相应的行动。
+**当有线程想要访问共享资源时，需要先获取(`acquire`)许可；如果许可不够了，线程需要一直等待，直到许可可用。当线程使用完共享资源后，可以归还(`release`)许可，以供其它需要的线程使用**。但是，不使用实际的许可对象，`Semaphore` 只对可用许可的号码进行计数，并采取相应的行动。
 
 另外，`Semaphore`支持公平/非公平策略，这和`ReentrantLock`类似。
 
-**`Semaphore`经常用于限制获取某种资源的线程数量。对于共享资源访问需要由锁来控制，`Semaphore`仅仅是保证了线程由权限使用共享资源，至于使用过程中是否由并发问题，需要通过锁来保证。**
+**`Semaphore`经常用于限制获取某种资源的线程数量。对于共享资源访问需要由锁来控制，`Semaphore`仅仅是保证了线程有权限使用共享资源，至于使用过程中是否有并发问题，需要通过锁来保证。**
 
 **总结一下，`许可数 ≤ 0`代表共享资源不可用。`许可数 ＞ 0`，代表共享资源可用，且多个线程可以同时访问共享资源。**
 
-**这是不是和CountDownLatch有点像？**
+**这是不是和`CountDownLatch`有点像？**
 
 | 同步器         | 作用                                                         |
 | -------------- | ------------------------------------------------------------ |
@@ -5943,8 +6036,8 @@ Barrier是否损坏：true
 一个停车场的简单例子来阐述 `Semaphore` ：
 
 - 为了简单起见我们假设停车场仅有 5 个停车位。一开始停车场没有车辆所有车位全部空着，然后先后到来三辆车，停车场车位够，安排进去停车，然后又来三辆，这个时候由于只有两个停车位，所有只能停两辆，其余一辆必须在外面候着，直到停车场有空车位。当然，以后每来一辆都需要在外面候着。当停车场有车开出去，里面有空位了，则安排一辆车进去（至于是哪辆，要看选择的机制是公平还是非公平）。
-- 从程序角度看，停车场就相当于信号量 Semaphore ，其中许可数为 5 ，车辆就相对线程。当来一辆车时，许可数就会减 1 。当停车场没有车位了（许可数 == 0 ），其他来的车辆需要在外面等候着。如果有一辆车开出停车场，许可数 + 1，然后放进来一辆车。
-- **信号量 Semaphore 是一个非负整数（ `>=1` ）。当一个线程想要访问某个共享资源时，它必须要先获取 Semaphore。当 Semaphore > 0 时，获取该资源并使 Semaphore – 1 。如果S emaphore 值 = 0，则表示全部的共享资源已经被其他线程全部占用，线程必须要等待其他线程释放资源。当线程释放资源时，Semaphore 则 +1** 。
+- 从程序角度看，停车场就相当于信号量 `Semaphore` ，其中许可数为 5 ，车辆就相对线程。当来一辆车时，许可数就会减 1 。当停车场没有车位了（许可数 == 0 ），其他来的车辆需要在外面等候着。如果有一辆车开出停车场，许可数 + 1，然后放进来一辆车。
+- **信号量 `Semaphore` 是一个非负整数（ `>=1` ）。当一个线程想要访问某个共享资源时，它必须要先获取 `Semaphore`。当 `Semaphore > 0` 时，获取该资源并使 `Semaphore – 1` 。如果`Semaphore 值 = 0`，则表示全部的共享资源已经被其他线程全部占用，线程必须要等待其他线程释放资源。当线程释放资源时，`Semaphore` 则 +1** 。
 
 ### 4.2、Semaphore原理
 
@@ -5964,8 +6057,8 @@ Barrier是否损坏：true
 
 `Semaphore` 提供了两个构造函数。
 
-1. `Semaphore(int permits)` ：创建具有给定的许可数和**非公平**的公平设置的 Semaphore 。
-2. `Semaphore(int permits, boolean fair)` ：创建具有给定的许可数和给定的公平设置的 Semaphore 。
+1. `Semaphore(int permits)` ：创建具有给定的许可数和**非公平**的公平设置的 `Semaphore` 。
+2. `Semaphore(int permits, boolean fair)` ：创建具有给定的许可数和给定的公平设置的 `Semaphore` 。
 
 实现如下：
 
@@ -6008,7 +6101,7 @@ Semaphore sm = new Semaphore (2, true);
 Semaphore sm = new Semaphore(2, true);
 ```
 
-可以看到，内部创建了一个**FairSync**对象，并传入许可数**permits**：
+可以看到，内部创建了一个**`FairSync`**对象，并传入许可数**`permits`**：
 
 ```java
 public Semaphore(int permits, boolean fair) {
@@ -6136,7 +6229,7 @@ public final void acquireSharedInterruptibly(int arg)
 此时，ThreadB一样进入**tryAcquireShared**方法。不同的是，此时剩余许可数不足，因为ThreadB一次性获取2个许可，**tryAcquireShared**方法返回一个负数，表示获取失败：
 `remaining = available - acquires = 1- 2 = -1;`
 
-在 `#acquireSharedInterruptibly(int arg)` 方法中，会调用 `#tryAcquireShared(int arg)` 方法。而 `#tryAcquireShared(int arg)` 方法，由子类来实现。对于 Semaphore 而言，如果我们选择非公平模式，则调用 NonfairSync 的`#tryAcquireShared(int arg)` 方法，否则调用 FairSync 的 `#tryAcquireShared(int arg)` 方法。若 `#tryAcquireShared(int arg)` 方法返回 `< 0` 时，则会**阻塞**等待，从而实现 Semaphore 信号量不足时的阻塞。
+在 `#acquireSharedInterruptibly(int arg)` 方法中，会调用 `#tryAcquireShared(int arg)` 方法。而 `#tryAcquireShared(int arg)` 方法，由子类来实现。对于 Semaphore 而言，如果我们选择非公平模式，则调用 NonfairSync 的`#tryAcquireShared(int arg)` 方法，否则调用 FairSync 的 `#tryAcquireShared(int arg)` 方法。若 `#tryAcquireShared(int arg)` 方法返回 `< 0` 时，则会**阻塞**等待，从而实现 `Semaphore` 信号量不足时的阻塞。
 
 另外，这也是为什么 `Semaphore` 在使用 AQS 时，**`state` 代表的是，剩余可获取的许可数，而不是已经使用的许可数。我们假设 `state` 代表的是已经使用的许可数，那么 `#tryAcquireShared(int arg)` 返回的结果 `= 原始许可数 - state` ，这个操作在并发情况下，会存在线程不安全的问题。所以，`state` 代表的是，剩余可获取的许可数，而不是已经使用的许可数**。
 
@@ -6348,11 +6441,11 @@ final int nonfairTryAcquireShared(int acquires) {
 - `release(int permits)` 释放指定数量的许可
 - `availablePermits()` 返回当前信号量还有几个可用的许可
 - `drainPermits()` 请求并立即返回当前信号量可用的全部许可
-- `reducePermits(int reduction)` 根据指定的缩减量减小可用许可的数目。此方法在使用信号量来跟踪那些变为不可用资源的子类中很有用。此方法不同于 acquire，在许可变为可用的过程中，它不会阻塞等待。
+- `reducePermits(int reduction)` 根据指定的缩减量减小可用许可的数目。此方法在使用信号量来跟踪那些变为不可用资源的子类中很有用。此方法不同于 `acquire`，在许可变为可用的过程中，它不会阻塞等待。
 - `isFair()` 返回当前的信号量时候是公平的
 - `hasQueuedThreads()` 查询是否有线程正在等待获取。注意，因为同时可能发生取消，所以返回 true 并不保证有其他线程等待获取许可。此方法主要用于监视系统状态。
 - `getQueueLength()` 返回正在等待获取的线程的估计数目。该值仅是估计的数字，因为在此方法遍历内部数据结构的同时，线程的数目可能动态地变化。此方法用于监视系统状态，不用于同步控制。
-- `getQueuedThreads()` 返回一个 collection，包含可能等待获取的线程。因为在构造此结果的同时实际的线程 set 可能动态地变化，所以返回的 collection 仅是尽力的估计值。所返回 collection 中的元素没有特定的顺序。此方法用于加快子类的构造速度，提供更多的监视设施。
+- `getQueuedThreads()` 返回一个 `collection`，包含可能等待获取的线程。因为在构造此结果的同时实际的线程 set 可能动态地变化，所以返回的 `collection` 仅是尽力的估计值。所返回 `collection` 中的元素没有特定的顺序。此方法用于加快子类的构造速度，提供更多的监视设施。
 
 ### 4.6、Semaphore示例
 
@@ -6502,7 +6595,7 @@ public class QueueGetFood implements Runnable {
 
     private Student student;
 
-    private Random random = new Random();
+        private Random random = new Random();
 
     QueueGetFood(Student student) {
         this.student = student;
@@ -6627,8 +6720,6 @@ public class QueueGetFood implements Runnable {
 打饭学生6终于打到饭了。。。
 ```
 
-
-
 ## 5、Exchange
 
 ### 5.1、Exchange简介
@@ -6637,11 +6728,11 @@ public class QueueGetFood implements Runnable {
 
 Exchanger有点类似于`CyclicBarrier`，我们知道`CyclicBarrier`是一个栅栏，到达栅栏的线程需要等待其它(一定数量)的线程到达后，才能通过栅栏。
 
-Exchanger可以看成是一个双向栅栏，如下图：
+`Exchanger可以看成是一个双向栅栏`，如下图：
 
 ![clipboard.png](.\img\3655810457-5b7034f01b70a_articlex.png)
 
-*`Thread1`线程到达栅栏后，会首先观察有没其它线程已经到达栅栏，如果没有就会等待，如果已经有其它线程（`Thread2`）已经到达了，就会以成对的方式交换各自携带的信息，因此Exchanger非常适合用于两个线程之间的数据交换。*
+*`Thread1`线程到达栅栏后，会首先观察有没其它线程已经到达栅栏，如果没有就会等待，如果已经有其它线程（`Thread2`）已经到达了，就会以成对的方式交换各自携带的信息，因此`Exchanger`非常适合用于两个线程之间的数据交换。*
 
 可以对元素进行配对和交换的线程的同步点。每个线程将条目上的某个方法呈现给 `exchange` 方法，与伙伴线程进行匹配，并且在返回时接收其伙伴的对象。Exchanger 可能被视为 `SynchronousQueue` 的双向形式。Exchanger 可能在应用程序（**比如遗传算法和管道设计**）中很有用。
 
@@ -6780,7 +6871,7 @@ private volatile Node slot;
 
 `participant`的作用是为每个线程保留唯一的一个`Node`节点。
 
-`slot`为单个槽，`arena`为数组槽。他们都是`Node`类型。在这里可能会感觉到疑惑，`slot`作为`Exchanger`交换数据的场景，应该只需要一个就可以了啊？为何还多了一个`Participant` 和数组类型的`arena`呢？一个slot交换场所原则上来说应该是可以的，但实际情况却不是如此，**多个参与者使用同一个交换场所时，会存在严重伸缩性问题。既然单个交换场所存在问题，那么我们就安排多个，也就是数组arena**。通过数组`arena`来安排不同的线程使用不同的`slot`来降低竞争问题，并且可以保证最终一定会成对交换数据。但是Exchanger不是一来就会生成`arena`数组来降低竞争，只有当产生竞争是才会生成`arena`数组。那么**怎么将`Node`与当前线程绑定呢？`Participant` ，`Participant` 的作用就是为每个线程保留唯一的一个`Node`节点，它继承`ThreadLocal`，同时在`Node`节点中记录在`arena`中的下标`index`。**
+`slot`为单个槽，`arena`为数组槽。他们都是`Node`类型。在这里可能会感觉到疑惑，`slot`作为`Exchanger`交换数据的场景，应该只需要一个就可以了啊？为何还多了一个`Participant` 和数组类型的`arena`呢？一个slot交换场所原则上来说应该是可以的，但实际情况却不是如此，**多个参与者使用同一个交换场所时，会存在严重伸缩性问题。既然单个交换场所存在问题，那么我们就安排多个，也就是数组arena**。通过数组`arena`来安排不同的线程使用不同的`slot`来降低竞争问题，并且可以保证最终一定会成对交换数据。但是Exchanger不是一来就会生成`arena`数组来降低竞争，只有当产生竞争时才会生成`arena`数组。那么**怎么将`Node`与当前线程绑定呢？`Participant` ，`Participant` 的作用就是为每个线程保留唯一的一个`Node`节点，它继承`ThreadLocal`，同时在`Node`节点中记录在`arena`中的下标`index`。**
 
 Node节点定义如下：
 
@@ -6804,7 +6895,7 @@ Node节点定义如下：
 - match：配对线程携带的数据（后到达的线程会将自身携带的值设置到配对线程的该字段上）
 - parked：此节点上的阻塞线程（先到达并阻塞的线程会设置该值为自身）
 
-在`Node`定义中有两个变量值得思考：`bound`以及`collides`。前面提到了数组`area`是为了避免竞争而产生的，如果系统不存在竞争问题，那么完全没有必要开辟一个高效的arena来徒增系统的复杂性。首先通过单个`slot`的`exchanger`来交换数据，当探测到竞争时将安排不同的位置的`slot`来保存线程`Node`，并且可以确保没有`slot`会在同一个缓存行上。如何来判断会有竞争呢？CAS替换`slot`失败，如果失败，则通过记录冲突次数来扩展`arena`的尺寸，我们在记录冲突的过程中会跟踪“bound”的值，以及会重新计算冲突次数在`bound`的值被改变时。
+在`Node`定义中有两个变量值得思考：`bound`以及`collides`。前面提到了数组`area`是为了避免竞争而产生的，如果系统不存在竞争问题，那么完全没有必要开辟一个高效的`arena`来徒增系统的复杂性。首先通过单个`slot`的`exchanger`来交换数据，当探测到竞争时将安排不同的位置的`slot`来保存线程`Node`，并且可以确保没有`slot`会在同一个缓存行上。如何来判断会有竞争呢？CAS替换`slot`失败，如果失败，则通过记录冲突次数来扩展`arena`的尺寸，我们在记录冲突的过程中会跟踪“bound”的值，以及会重新计算冲突次数在`bound`的值被改变时。
 
 #### 5.3.3、Exchanger的单槽位交换
 
@@ -6924,7 +7015,7 @@ private final Object slotExchange(Object item, boolean timed, long ns) {
 
 上述代码的整个流程大致如下：
 
-<img src=".\img\3728110420-5b72c7a7becd1_articlex.png" alt="clipboard.png" style="zoom:170%;" />
+<img src=".\img\3728110420-5b72c7a7becd1_articlex.png" alt="clipboard.png" style="zoom:200%;" />
 
 **首先到达的线程：**
 
@@ -7136,8 +7227,6 @@ private final Object slotExchange(Object item, boolean timed, long ns) {
 5. 我跑去喊管理员，尼玛，就一个坑交易个毛啊，然后管理在一个更加开阔的地方开辟了好多个单间，然后我就挨个来看每个单间是否有人。如果有人我就问他是否可以交易，如果回应了我，那我就进入第2步。如果我没有人，那我就占着这个单间等其他人来交易，进入第4步。
 6. 如果我尝试了几次都没有成功，我就会认为，是不是我TM选的这个单间风水不好？不行，得换个地儿继续(从头开始)；如果我尝试了多次发现还没有成功，怒了，把管理员喊来：给哥再开一个单间(Slot)，加一个凳子，这么多人就这么几个破凳子够谁用！
 
-
-
 ## 6、Phaser
 
 ### 6.1、简介
@@ -7148,7 +7237,7 @@ private final Object slotExchange(Object item, boolean timed, long ns) {
 | -------------- | ------------------------------------------------------------ |
 | CountDownLatch | 倒数计数器，初始时设定计数器值，线程可以在计数器上等待，当计数器值归0后，所有等待的线程继续执行 |
 | CyclicBarrier  | 循环栅栏，初始时设定参与线程数，当线程到达栅栏后，会等待其它线程的到达，当到达栅栏的总数满足指定数后，所有等待的线程继续执行 |
-| Phaser         | 多阶段栅栏，可以在初始时设定参与线程数，也可以中途注册/注销参与者，当到达的参与者数量满足栅栏设定的数量后，会进行阶段升级（advance） |
+| Phaser         | 多阶段栅栏，可以在初始时设定参与线程数，也可以中途注册/注销参与者，当到达的参与者数量满足栅栏设定的数量后，会进行阶段升级（`advance`） |
 
 **`Phaser`**中有一些比较重要的概念，理解了这些概念才能理解Phaser的功能。
 
@@ -7230,7 +7319,7 @@ Thread-1: 执行完任务，当前phase =1
 Thread-2: 执行完任务，当前phase =1
 ```
 
-以上示例中，创建了10个线程，并通过`register`方法注册Phaser的参与者数量为10，也可以在`Phaser`初始时指定`parties`数。当某个线程调用`arriveAndAwaitAdvance`方法后，**arrive**数量会加1，如果数量没有满足总数（参与者数量10），当前线程就是一直等待，当最后一个线程到达后，所有线程都会继续往下执行。
+以上示例中，创建了10个线程，并通过`register`方法注册`Phaser`的参与者数量为10，也可以在`Phaser`初始时指定`parties`数。当某个线程调用`arriveAndAwaitAdvance`方法后，**`arrive`**数量会加1，如果数量没有满足总数（参与者数量10），当前线程就是一直等待，当最后一个线程到达后，所有线程都会继续往下执行。
 
 > **注意：**`arriveAndAwaitAdvance`方法是不响应中断的，也就是说即使当前线程被中断，**`arriveAndAwaitAdvance`**方法也不会返回或抛出异常，而是继续等待。如果希望能够响应中断，可以参考`awaitAdvanceInterruptibly`方法。
 
@@ -7332,7 +7421,7 @@ public class TestMain {
 
 #### 6.2.3、示例三
 
-> 通过Phaser实现开关。在以前讲**CountDownLatch**时，我们给出过以**CountDownLatch**实现开关的示例，也就是说，我们希望一些外部条件得到满足后，然后打开开关，线程才能继续执行，我们看下如何用**Phaser**来实现此功能。
+> 通过Phaser实现开关。在以前讲**`CountDownLatch`**时，我们给出过以**`CountDownLatch`**实现开关的示例，也就是说，我们希望一些外部条件得到满足后，然后打开开关，线程才能继续执行，我们看下如何用**Phaser**来实现此功能。
 
 ```java
 public class PhaserTest2 {
@@ -7340,7 +7429,7 @@ public class PhaserTest2 {
     public static void main(String[] args) throws IOException {
         Phaser phaser = new Phaser(1);       // 注册主线程,当外部条件满足时,由主线程打开开关
         for (int i = 0; i < 10; i++) {
-            phaser.register();                      // 注册各个参与者线程
+            phaser.register();               // 注册各个参与者线程
             new Thread(new Task2(phaser), "Thread-" + i).start();
         }
 
@@ -7467,13 +7556,13 @@ Thread-3: 执行完任务
 
 以上示例中，我们在创建Phaser对象时，覆写了`onAdvance`方法，这个方法类似于**CyclicBarrier**中的`barrierAction`任务。
 
-也就是说，当最后一个参与者到达时，会触发`onAdvance`方法，入参**`phase`**表示到达时的`phase`值，**`registeredParties`**表示到达时的参与者数量，返回true表示需要终止Phaser。
+也就是说，当最后一个参与者到达时，会触发`onAdvance`方法，**入参`phase`表示到达时的`phase`值，`registeredParties`表示到达时的参与者数量，返回`true`表示需要终止Phaser。**
 
 我们通过`phase + 1 >= repeats` ，来控制**阶段（phase）**数的上限为2（从0开始计），最终控制了每个线程的执行任务次数为**`repeats`**次。
 
 #### 6.2.5、示例五
 
-前面两个例子都比较简单,现在我们还用`Phaser`一个比较高级一点用法.还是用旅游的例子
+前面例子都比较简单,现在我们还用`Phaser`一个比较高级一点用法.还是用旅游的例子
 假如有这么一个场景,在旅游过程中,有可能很凑巧遇到几个朋友,然后他们听说你们在旅游,所以想要加入一起继续接下来的旅游.也有可能,在旅游过程中,突然其中有某几个人临时有事,想退出这次旅游了.在自由行的旅游,这是很常见的一些事情.如果现在我们使用`CyclicBarrier`这个类来实现,我们发现是实现不了,这是用`Phaser`就可实现这个功能.
 
 - 首先,我们改写旅游类 `TourismRunnable`,这次改动相对比较多一点
@@ -7812,19 +7901,17 @@ https://segmentfault.com/a/1190000015979879#item-3
 - `arriveAndDeregister()`：使当前线程退出，并且使`parties`值减1；该方法立即返回下一阶段的序号，并且其它线程需要等待的个数减一，并且把当前线程从之后需要等待的成员中移除。如果该`Phaser`是另外一个`Phaser`的子`Phaser`（层次化`Phaser`会在后文中讲到），并且该操作导致当前`Phaser`的成员数为0，则该操作也会将当前`Phaser`从其父`Phaser`中移除。
   `arrive()` 该方法不作任何等待，直接返回下一阶段的序号。
 - `getPhase()`：获取的是已经到达第几个屏障。
-- `onAdvance()`：每一阶段的最后一个参与者到达时，会触发`onAdvance`方法，`Phaser`都会执行其`onAdvance`方法。
-- `getRegisteredParties()`：获得注册的parties数量。
+- `onAdvance()`：每一阶段的最后一个参与者到达时，会触发`onAdvance`方法，`Phaser`都会执行其`onAdvance`方法，用于判断是否终止`Phaser`。
+- `getRegisteredParties()`：获得注册的`parties`数量。
 - `register()`：每执行一次方法`register()`就动态添加一个`parties`值。
 - `bulkRegister(int parties)`：批量增加`parties`数量，
 - `getArrivedParties()和getUnarrivedParties()`：方法`getArrivedParties()`获得已经被使用的`parties`个数，方法`getUnarrivedParties()`获得未被使用的`parties`个数。
 - `arrive()`：使`parties`值加1，并且不再屏障处等待，直接向下面的代码继续运行，并且`Phaser`类有计数重置功能。
-- `awaitAdvance(int phase)`：如果传入参数`phase`值和当前`getPhase()`方法返回值一样，而在屏障处等待，否则继续向下面运行，有些类似于旁观者的作用，当观察的条件满足了就等待，如果条件不满足，则程序向下继续运行。
+- `awaitAdvance(int phase)`：**如果传入参数`phase`值和当前`getPhase()`方法返回值一样，而在屏障处等待，否则继续向下面运行，有些类似于旁观者的作用，当观察的条件满足了就等待，如果条件不满足，则程序向下继续运行。**
 - `awaitAdvanceInterruptibly(int phase)`：效果与`awaitAdvance(int phase)`相当，唯一的不同在于若该线程在该方法等待时被中断，则该方法抛出`InterruptedException`。
 - `awaitAdvanceInterruptibly(int phase,long timeout,TimeUnit unit)`：效果与`awaitAdvanceInterruptibly(int phase)`相当，区别在于如果超时则抛出`TimeoutException`。
 - `forceTermination()`：强制让该`Phaser`进入终止状态。已经注册的`party`数不受影响。如果该`Phaser`有子`Phaser`，则其所有的子`Phaser`均进入终止状态。如果该`Phaser`已经处于终止状态，该方法调用不造成任何影响。
 - `isTerminated()`：判断Phaser对象是否已经呈销毁状态；true--已销毁，flase--未销毁。
-
-
 
 # 五、Executors框架
 
