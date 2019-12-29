@@ -7921,9 +7921,9 @@ https://segmentfault.com/a/1190000015979879#item-3
 
 #### 1.1.1、executor简介
 
-`java.util.concurrent.Executor` ，任务的执行者接口，线程池框架中几乎所有类都直接或者间接实现 Executor 接口，它是线程池框架的基础。
+`java.util.concurrent.Executor` ，任务的执行者接口，线程池框架中几乎所有类都直接或者间接实现 `Executor` 接口，它是线程池框架的基础。
 
-Executor 提供了一种将**“任务提交”与“任务执行”分离开来的机制(解耦任务本身和任务的执行)**，它仅提供了一个 `#execute(Runnable command)` 方法，用来执行已经提交的 Runnable 任务。代码如下：
+`Executor` 提供了一种将**“任务提交”与“任务执行”分离开来的机制(解耦任务本身和任务的执行)**，它仅提供了一个 `#execute(Runnable command)` 方法，用来执行已经提交的 Runnable 任务。代码如下：
 
 ```java
 public interface Executor {
@@ -7966,7 +7966,7 @@ executor.execute(new RunnableTask2());
 
 - **任务的执行**。包括任务执行机制的核心接口`Executor`，以及继承自`Executor`的`ExecutorService`接口。`Executor`框架有两个关键类实现了`ExecutorService`接口（`ThreadPoolExecutor` 和 `ScheduledThreadPoolExecutor`）。
 
-- **异步计算的结果**。包括接口`Future`和实现`Future`接口的`FutureTask`类。
+- **异步计算的结果**。包括接口`Future`和实现`Future`接口的`FutureTask`类等。
 
 `Executor`框架包含的主要的类与接口如下图所示：
 
@@ -7978,7 +7978,7 @@ executor.execute(new RunnableTask2());
 
 - `Executor`是一个接口，它是`Executor`框架的基础，它将任务的提交与任务的执行分离开来。
 - `ThreadPoolExecutor` 是线程池的核心实现类，用来执行被提交的任务。
-- `ScheduledThreadPoolExecutor` 是一个实现类，可以在给定的延迟后运行命令，或者定期执行命令。`ScheduledThreadPoolExecutor`比`Timer`更灵活，功能更强大。
+- `ScheduledThreadPoolExecutor` 是一个实现类，可以在给定的延迟后运行任务，或者定期执行任务。`ScheduledThreadPoolExecutor`比`Timer`更灵活，功能更强大。
 - `Future`接口和实现`Future`接口的`FutureTask`类，代表异步计算的结果。
 - `Runnable`接口和`Callable`接口的实现类，都可以被`ThreadPoolExecutor` 或`ScheduledThreadPoolExecutor`执行。
 
@@ -7992,7 +7992,7 @@ executor.execute(new RunnableTask2());
 - `Executors.callable(Runnable task)`
 - `Executors.callable(Runnable task, Object resule)`。
 
-然后可以把`Runnable`对象直接交给`ExecutorService`执行`ExecutorService.execute(Runnable command)`；或者也可以把`Runnable`对象或`Callable`对象提交给`ExecutorService` 执行  `ExecutorService.submit(Runnable task)` 或 `ExecutorService.submit(Callabletask)`。
+然后可以把`Runnable`对象直接交给`ExecutorService`执行`ExecutorService.execute(Runnable command)`；或者也可以把`Runnable`对象或`Callable`对象提交给`ExecutorService` 执行  `ExecutorService.submit(Runnable task)` 或 `ExecutorService.submit(Callable task)`。
 
 如果执行`ExecutorService.submit(…)`，`ExecutorService` 将返回一个实现 `Future` 接口的对象（`到目前为止的JDK中，返回的是FutureTask对象`）。由于`FutureTask`实现了`Runnable`，程序员也可以创建`FutureTask`，然后直接交给`ExecutorService`执行。
 
@@ -8313,7 +8313,7 @@ static class DefaultThreadFactory implements ThreadFactory {
 `FixedThreadPool`使用无界队列`LinkedBlockingQueue`作为线程池的工作队列（队列的容量为`Integer.MAX_VALUE`）。
  使用无界队列作为工作队列会对线程池带来如下影响：
 
-- 当线程池中的线程数达到`corePoolSize`后，新任务将在无界队列中等待，因此线程池中的线程数不会超过`corePoolSize`。
+- 当线程池中的线程数达到`corePoolSize`后，新任务将在无界队列中等待，因此**线程池中的线程数不会超过`corePoolSize`**。
 - 由于上一点，使用无界队列时`maximumPoolSize`将是一个无效参数。
 - 由于前面两点，使用无界队列时`keepAliveTime`将是一个无效参数。
 - 由于使用无界队列，运行中的`FixedThreadPool`（未执行方法`shutdown()`或`shutdownNow()`）不会拒绝任务（不会调用`RejectedExecutionHandler.rejectedExecution`方法）。
@@ -8428,7 +8428,7 @@ static class DelegatedExecutorService extends AbstractExecutorService {
 }
 ```
 
-> **为什么要多此一举，加上这样一个委托层？**因为**返回的`ThreadPoolExecutor`包含一些设置线程池大小的方法——比如`setCorePoolSize`，对于只有单个线程的线程池来说，我们是不希望用户通过强转的方式使用这些方法的，所以需要一个包装类，只暴露ExecutorService本身的方法**。
+> **为什么要多此一举，加上这样一个委托层？**因为**返回的`ThreadPoolExecutor`包含一些设置线程池大小的方法——比如`setCorePoolSize`，对于只有单个线程的线程池来说，我们是不希望用户通过强转的方式使用这些方法的，所以需要一个包装类，只暴露`ExecutorService`本身的方法**。
 
 **`SingleThreadExecutor`的运行示意图如下图所示：**
 
@@ -8491,7 +8491,7 @@ public static ExecutorService newCachedThreadPool(ThreadFactory threadFactory) {
 
 #### 1.2.4、可延时/周期调度的线程池
 
-如果有任务需要延迟/周期调用，就需要返回ScheduledExecutorService接口的实例，`ScheduledThreadPoolExecutor`就是实现了`ScheduledExecutorService`接口的一种`Executor`，和`ThreadPoolExecutor`一样
+如果有任务需要延迟/周期调用，就需要返回`ScheduledExecutorService`接口的实例，`ScheduledThreadPoolExecutor`就是实现了`ScheduledExecutorService`接口的一种`Executor`，和`ThreadPoolExecutor`一样
 
 ```java
 /**
@@ -8596,8 +8596,6 @@ public static ExecutorService newWorkStealingPool() {
 4. 创建并返回 `ThreadFactory` 的方法，它可将新创建的线程设置为已知的状态。
 5. 创建并返回非闭包形式的 `Callable` 的方法，这样可将其用于需要 `Callable` 的执行方法中。
 
-
-
 ## 2、ThreadPoolExecutor
 
 ### 2.1、ThreadPoolExecutor简介
@@ -8606,7 +8604,7 @@ public static ExecutorService newWorkStealingPool() {
 
 ![clipboard.png](.\img\1983609367-5bbcd4187218d_articlex.png)
 
-`ThreadPoolExecutor`并没有自己直接实现`ExecutorService`接口，**因为它只是其中一种`Executor`的实现而已，所以Doug Lea把一些通用部分封装成一个抽象父类——`AbstractExecutorService`**，供J.U.C中的其它执行器继承。如果读者需要自己实现一个Executor，也可以继承该抽象类。
+`ThreadPoolExecutor`并没有自己直接实现`ExecutorService`接口，**因为它只是其中一种`Executor`的实现而已，所以Doug Lea把一些通用部分封装成一个抽象父类——`AbstractExecutorService`**，供J.U.C中的其它执行器继承。如果读者需要自己实现一个`Executor`，也可以继承该抽象类。
 
 ![clipboard.png](.\img\1208147182-5bbd6a8d56ad0_articlex.png)
 
@@ -8638,7 +8636,7 @@ protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
 `FutureTask`其实就是`Future`接口的实现类：
 ![clipboard.png](.\img\3623712462-5bbd6ac6f05c6_articlex.png)
 
-> 我们之前讲过，J.U.C中的`Future`接口是“Future模式”的多线程设计模式的实现，**可以让调用方以异步方式获取任务的执行结果**。而FutureTask便是这样一类支持异步返回结果的任务，既然是任务就需要实现Runnable接口，同时又要支持异步功能，所以又需要实现Future接口。J.U.C为了方便，新定义了一个接口——**RunnableFuture**，该接口同时继承Runnable和Future，代表支持异步处理的任务，而`FutureTask`便是它的默认实现。
+> 我们之前讲过，J.U.C中的`Future`接口是“Future模式”的多线程设计模式的实现，**可以让调用方以异步方式获取任务的执行结果**。而`FutureTask`便是这样一类支持异步返回结果的任务，既然是任务就需要实现`Runnable`接口，同时又要支持异步功能，所以又需要实现Future接口。J.U.C为了方便，新定义了一个接口——**`RunnableFuture`**，该接口同时继承Runnable和Future，代表支持异步处理的任务，而`FutureTask`便是它的默认实现。
 
 #### 2.1.2、线程池简介
 
@@ -8669,7 +8667,7 @@ protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
  * @param unit            keepAliveTime的单位
  * @param workQueue       任务队列, 保存已经提交但尚未被执行的线程
  * @param threadFactory   线程工厂(用于指定如何创建一个线程)
- * @param handler         拒绝策略 (当任务太多导致工作队列满时的处理策略)
+ * @param handler         拒绝策略 (当任务太多导致工作队列满且无多的线程处理任务时的处理策略)
  */
 public ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
                           BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory,
@@ -8711,6 +8709,7 @@ public ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveT
   - 天（`DAYS`）
   - 小时（`HOURS`）
   - 分钟（`MINUTES`）
+  - 秒（**`SECONDS`**）
   - 毫秒（`MILLISECONDS`）
   - 微秒（`MICROSECONDS`，千分之一毫秒）
   - 纳秒（`NANOSECONDS`，千分之一微秒）
@@ -8720,10 +8719,10 @@ public ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveT
   用来保存等待执行的任务的阻塞队列，等待的任务必须实现`Runnable`接口。我们可以选择如下几种：
 
   - `ArrayBlockingQueue`：可以限定队列的长度，**接收到任务的时候，如果工作线程数没有达到`corePoolSize`的值，则新建线程(核心线程)执行任务，如果达到了，则入队等候，如果队列已满，则新建线程(非核心线程)执行任务，又如果工作线程数到了`maximumPoolSize`，并且队列也满了，则执行拒绝策略。**
-  - `LinkedBlockingQueue`：基于链表结构的近似无界阻塞队列。**这个队列接收到任务的时候，如果当前工作线程数小于核心线程数，则新建线程(核心线程)处理任务；如果当前工作线程数等于核心线程数，则进入队列等待。由于这个队列没有线程最大值限制，即所有超过核心线程数的任务都将被添加到队列中，这也就导致了`maximumPoolSize`的设定失效，因为总线程数永远不会超过`corePoolSize`**
+  - `LinkedBlockingQueue`：基于链表结构的近似无界阻塞队列。**这个队列接收到任务的时候，如果当前工作线程数小于核心线程数，则新建线程(核心线程)处理任务；如果当前工作线程数等于核心线程数，则进入队列等待。由于这个队列没有最大值限制，即所有超过核心线程数的任务都将被添加到队列中，这也就导致了`maximumPoolSize`的设定失效，因为总线程数永远不会超过`corePoolSize`**
   - `SynchronousQueue`：不存储元素的阻塞队列，每个插入操作都必须等待一个移出操作，反之亦然。**这个队列接收到任务的时候，会直接提交给线程处理，而不保留它，如果所有线程都在工作怎么办？那就新建一个线程来处理这个任务！所以为了保证不出现<线程数达到了`maximumPoolSize`而不能新建线程>的错误，使用这个类型队列的时候，`corePoolSize`指定成0，`maximumPoolSize`一般指定成`Integer.MAX_VALUE`，即无限大。**
   - `PriorityBlockingQueue`：具有优先界别的阻塞队列。
-  - `DelayQueue`：队列内元素必须实现Delayed接口，这就意味着你传进去的任务必须先实现Delayed接口。这个队列接收到任务时，首先先入队，**只有达到了指定的延时时间，才会执行任务**
+  - `DelayQueue`：队列内元素必须实现Delayed接口，这就意味着你传进去的任务必须先实现`Delayed`接口。这个队列接收到任务时，首先先入队，**只有达到了指定的延时时间，才会执行任务**
 
 - **`threadFactory`**
 
@@ -8766,7 +8765,7 @@ static class DefaultThreadFactory implements ThreadFactory {
 }
 ```
 
-​	`ThreadFactory`就是提供创建线程的功能的线程工厂。他是通过`newThread()`方法提供创建线程的功	能，`newThread()`方法创建的线程都是“非守护线程”而且“线程优先级都是Thread.NORM_PRIORITY=5”。
+`ThreadFactory`就是提供创建线程的功能的线程工厂。他是通过`newThread()`方法提供创建线程的功能，`newThread()`方法创建的线程都是“非守护线程”而且“线程优先级都是Thread.NORM_PRIORITY=5”。
 
 - **`handler`**
 
@@ -8946,9 +8945,9 @@ private final class Worker extends AbstractQueuedSynchronizer implements Runnabl
 
 #### 2.2.3、线程工厂
 
-`ThreadFactory`用来创建单个线程，当线程池需要创建一个线程时，就要调用该类的`newThread(Runnable r)`方法创建线程（ThreadPoolExecutor中实际创建线程的时刻是在将任务包装成工作线程Worker时）。
+`ThreadFactory`用来创建单个线程，当线程池需要创建一个线程时，就要调用该类的`newThread(Runnable r)`方法创建线程（`ThreadPoolExecutor`中实**际创建线程的时刻是在将任务包装成工作线程Worker时**）。
 
-ThreadPoolExecutor在构造时如果用户不指定ThreadFactory，则默认使用`Executors.defaultThreadFactory()`创建一个ThreadFactory，即Executors.DefaultThreadFactory：
+`ThreadPoolExecutor`在构造时如果用户不指定ThreadFactory，则默认使用`Executors.defaultThreadFactory()`创建一个ThreadFactory，即Executors.DefaultThreadFactory：
 
 ```java
 public static ThreadFactory defaultThreadFactory() {
@@ -9376,8 +9375,8 @@ getTask方法的主要作用就是：**通过自旋，不断地尝试从阻塞�
 
 即直接将任务提交给等待的工作线程，这时可以选择**`SynchronousQueue`**。因为`SynchronousQueue`是没有容量的，而且采用了无锁算法，所以性能较好，但是每个入队操作都要等待一个出队操作，反之亦然。
 
-> **使用`SynchronousQueue`时，当核心线程池满了以后，如果不存在空闲的工作线程，则试图把任务加入队列将立即失败（execute方法中使用了队列的offer方法进行入队操作，而SynchronousQueue在调用offer时如果没有另一个线程等待出队操作，则会立即返回false），因此会构造一个新的工作线程（未超出最大线程池容量时）**。
-> 由于，核心线程池是很容易满的，所以当使用`SynchronousQueue`时，一般需要将`maximumPoolSizes` 设置得比较大，否则入队很容易失败，最终导致执行拒绝策略，这也是为什么`Executors`工作默认提供的缓存线程池使用SynchronousQueue作为任务队列的原因。
+> **使用`SynchronousQueue`时，当核心线程池满了以后，如果不存在空闲的工作线程，则试图把任务加入队列将立即失败（`execute`方法中使用了队列的`offer`方法进行入队操作，而`SynchronousQueue`在调用`offer`时如果没有另一个线程等待出队操作，则会立即返回false），因此会构造一个新的工作线程（未超出最大线程池容量时）**。
+> 由于，核心线程池是很容易满的，所以当使用`SynchronousQueue`时，一般需要将`maximumPoolSizes` 设置得比较大，否则入队很容易失败，最终导致执行拒绝策略，这也是为什么`Executors`工作默认提供的缓存线程池使用`SynchronousQueue`作为任务队列的原因。
 
 **2.无界任务队列**
 
@@ -9887,7 +9886,7 @@ public class CustomUnblockThreadPoolExecutor {
 - 如果任务是 **CPU 密集型**（需要进行大量计算、处理），则应该配置尽量少的线程，比如 CPU 个数 + 1，这样可以避免出现每个线程都需要使用很长时间但是有太多线程争抢资源的情况；
 - 如果任务是 **IO密集型**（主要时间都在 I/O，CPU 空闲时间比较多），则应该配置多一些线程，比如 CPU 数的两倍，这样可以更高地压榨 CPU。
 
-***1、用`ThreadPoolExecutor`自定义线程池，看线程是的用途，如果任务量不大，可以用无界队列，如果任务量非常大，要用有界队列，防止OOM*** 
+***1、用`ThreadPoolExecutor`自定义线程池，看线程的用途，如果任务量不大，可以用无界队列，如果任务量非常大，要用有界队列，防止OOM*** 
 ***2、如果任务量很大，还要求每个任务都处理成功，要对提交的任务进行阻塞提交，重写拒绝机制，改为阻塞提交。保证不抛弃一个任务*** 
 ***3、最大线程数一般设为2N+1最好，N是CPU核数*** 
 ***4、核心线程数，看应用，如果是任务，一天跑一次，设置为0，合适，因为跑完就停掉了，如果是常用线程池，看任务量，是保留一个核心还是几个核心线程数*** 
