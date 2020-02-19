@@ -6951,7 +6951,7 @@ public class PredicateFunctionDemoOne {
 
 ### 4. Function
 
-`java.util.function.Function<T, R>` 用来根据一个类型的数据得到另一个类型的数据,前者称为apply()参数类型,后者称apply()为返回类型.
+`java.util.function.Function<T, R>` 用来根据一个类型的数据得到另一个类型的数据,前者称为apply()参数类型,后者称apply()为返回类型。
 
 #### 抽象方法：apply
 
@@ -7061,7 +7061,7 @@ public class FunctionInteFunctionDemoOne {
 当需要对多个元素进行操作（特别是多步操作）的时候，考虑到性能及便利性，我们应该首先拼好一个“模型”步骤
 方案，然后再按照方案去执行它
 
-![1558276512362](.\img\%5CUsers%5CAdministrator%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5C1558276512362.png)
+![1558276512362](.\img\asdasdasfasgsda.png)
 
 这张图中展示了过滤、映射、跳过、计数等多步操作，这是一种集合元素的处理方案，而方案就是一种“函数模型”。图中的每一个方框都是一个“流”，调用指定的方法，可以从一个流模型转换为另一个流模型。而最右侧的数字3是最终结果
 
