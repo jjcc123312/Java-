@@ -6357,7 +6357,7 @@ ThreadB被唤醒后，从下面开始继续往下执行，进入下一次自旋�
 在下一次自旋中，ThreadB调用**tryAcquireShared**方法成功获取到共享资源（State修改为0），**setHeadAndPropagate**方法把ThreadB变为头结点，
 并根据传播状态判断是否要唤醒并释放后继结点：
 
-# ![clipboard.png](.\img\1487534961-5b6be1cb9aaf8_articlex.png)
+![clipboard.png](.\img\1487534961-5b6be1cb9aaf8_articlex.png)
 
 ![clipboard.png](.\img\2391920370-5b6be1d90370f_articlex.png)
 
